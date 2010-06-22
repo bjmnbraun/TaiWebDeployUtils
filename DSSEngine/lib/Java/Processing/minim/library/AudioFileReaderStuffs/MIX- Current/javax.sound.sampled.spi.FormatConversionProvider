@@ -1,0 +1,5 @@
+# for the jorbis decoder
+javazoom.spi.vorbis.sampled.convert.VorbisFormatConversionProvider
+# for the javalayer mp3 decoder
+javazoom.spi.mpeg.sampled.convert.MpegFormatConversionProvider
+#end

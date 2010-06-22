@@ -1,0 +1,9 @@
+# for the jorbis decoder
+
+
+org.tritonus.sampled.convert.jorbis.JorbisFormatConversionProvider
+# for the javalayer mp3 decoder
+javazoom.spi.mpeg.sampled.convert.MpegFormatConversionProvider
+
+
+#end

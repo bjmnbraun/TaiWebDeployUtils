@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<project name="BulletHell.makejar" basedir="./build/" default="RUN ME TO BUILD">
+	<!-- make sure outjar / outjar2 are both only filenames, no paths. -->
+	<property name="DeploymentName" value="BulletHell" />
+
+	<!-- outjar contains code, outjar2 contains resources (images, etc. -->
+	<!-- outjar is loaded immediately, outjar2 is lazily loaded -->
+	<property name="outjar" value="${DeploymentName}_1.jar" />
+	<property name="outjar2" value="${DeploymentName}_2.jar" />
+	<property name="webjar" value="${DeploymentName}_web_1.jar" />
+	<property name="webjar2" value="${DeploymentName}_web_2.jar" />
+	<!-- TODO: figure out how to share libraries. -->
+	<property name="lib" value="../lib" />
+	<property name="dataDir" value="res" />
+	<property name="taiLaunchMain" value="Deployments.${DeploymentName}" />
+	<property name="p5Main" value="Deployments.BulletHell_Lite_JOGL2" />
+	<property name="onlineIncludes" value="
+		BulletGame*/**/*.class,
+		Deployments*/**/*.class,
+		processing*/**/*.class,
+		TaiGameCore*/**/*.class,
+		TaiScript*/**/*.class,
+		com/iabcinc/**/*.class,
+		com/jcraft/**/*.class,
+		ddf/**/*.class,
+		javazoom/**/*.class,
+		edu/**/*.class" />
+		
+	<property name="DSS_anttasks_path" value="../DSS-anttasks.jar" />
+	<taskdef name="increment" classname="uttaifun.funant.increment" classpath="${DSS_anttasks_path}" />
+	<taskdef name="srchreplace" classname="uttaifun.funant.srchReplace" classpath="${DSS_anttasks_path}" />
+	<taskdef name="signit" classname="uttaifun.funant.signit" classpath="${DSS_anttasks_path}" />
+	<taskdef name="for" classname="net.sf.antcontrib.logic.ForTask" classpath="../ant-contrib-1.0b3.jar"/>
+	<taskdef name="propertyregex" classname="net.sf.antcontrib.property.RegexTask" classpath="../ant-contrib-1.0b3.jar"/>
+	  
+	<target name="makeAdditional" description="Setup the infrequently changing parts of BulletHell2">
+		<delete file="${outjar2}" />
+		<increment srcfile="${basedir}/../${dataDir}/embed/version" />
+		<jar destfile="${outjar2}">
+			<fileset dir="../${dataDir}/">
+				<include name="embed/**" />
+				<exclude name="**/*.xcf" />
+			</fileset>
+		</jar>
+	</target>
+
+
+	<target name="SetToLocal">
+		<property name="DST_PUBLIC_URL" value="file:///${basedir}/web" />
+	</target>
+	<target name="SetToPublic">
+		<property name="DST_PUBLIC_URL" value="_YOUR ONLINE URL HERE_" />
+	</target>
+	<!-- Note: if you get annoyed at the time makeAdditional takes to run, it's not 
+	necessary to run each time. -->
+	<target name="RUN ME BEFORE WEB UPLOAD" depends="SetToPublic, makeAdditional, makeWeb, uploadHtml" />
+	<target name="RUN ME TO BUILD"  depends="SetToLocal, makeAdditional, makeWeb, uploadHtml" />
+	<target name="RUN ME TO LOCALWEBTEST" depends="SetToLocal,makeAdditional,makeWeb, uploadHtml">
+		<exec executable="cmd.exe">
+			<arg line="/C start ${basedir}/web/index.html" />
+		</exec>
+	</target>
+
+
+	
+	<target name="compile.java" description="Compiles the java files" >
+		<mkdir dir="./bin/" />
+        <javac destdir="./bin/" includes="**/**"
+               includeAntRuntime="false"
+               source="1.5" debug="true" debuglevel="source,lines">
+            <src path="../src:../src_lib/jmep:../src_lib/jmpeg:../src_lib/jorbis:../src_lib/minim:../src_lib/viperapi:../src_lib/vorbisspi" />
+			<classpath>
+<pathelement location="${lib}/Java/Processing/core.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/tritonus_share.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/jl1.0.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/jsminim.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/minim.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/mp3spi1.9.4.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/tritonus_aos.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/tritonus_jorbis.jar"/>
+<pathelement location="${lib}/Java/Processing/minim/library/vorbisspi1.0.3.jar"/>
+<pathelement location="${basedir}/../${dataDir}/web/natives/gluegen-rt.jar"/>
+<pathelement location="${basedir}/../${dataDir}/web/natives/nativewindow.all.jar"/>
+<pathelement location="${basedir}/../${dataDir}/web/natives/jogl.all.jar"/>
+			</classpath>
+        </javac>
+	</target>
+
+	<target name="makeWeb" description="Sets up the webpage form of this app." depends="compile.java">
+		<echo message="Warning: makeweb does not run makeAdditional!" />
+		<!-- move the jnlp over-->
+		<copy file="${basedir}/../${dataDir}/web/myjnlp.jnlp" tofile="./web/myjnlp.jnlp" />
+		
+		<!--
+		<copy file="${lib}/Java/Processing/minim/library/jl1.0.jar" tofile="./web/jl1.0.jar" />
+		<copy file="${lib}/Java/Processing/minim/library/jsminim.jar" tofile="./web/jsminim.jar" />
+		<copy file="${lib}/Java/Processing/minim/library/minim.jar" tofile="./web/minim.jar" />
+		<copy file="${lib}/Java/Processing/minim/library/minim-spi.jar" tofile="./web/minim-spi.jar" />
+		<copy file="${lib}/Java/Processing/minim/library/mp3spi1.9.4.jar" tofile="./web/mp3spi1.9.4.jar" />
+		<copy file="${lib}/Java/Processing/minim/library/tritonus_share.jar" tofile="./web/tritonus_share.jar" />
+		-->
+
+		<!-- custom make the main jar -->
+		<delete file="./web/${webjar}" />
+		<jar jarfile="./web/${webjar}" includes="${onlineIncludes}" basedir="./bin/">
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/core.jar" />
+
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/jl1.0.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/mp3spi1.9.4.jar" />
+
+			<!--
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/minim.jar" />
+			-->
+
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/jsminim.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/minim-spi.jar" />
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/tritonus_share.jar" />
+
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/tritonus_jorbis.jar" />
+
+			<zipfileset excludes="META-INF/*.SF" src="${lib}/Java/Processing/minim/library/vorbisspi1.0.3.jar" />
+		</jar>
+		<!-- copy jar2 -->
+		<copy file="${outjar2}" tofile="./web/${webjar2}" />
+
+		<!-- copy the required webfiles -->
+		<copy todir="./web/">
+			<fileset dir="../${dataDir}/web/natives/" includes="*.jar" />
+		</copy>
+		<!-- Put in the required jnlps, but replacing the URL with destination -->
+		<for param="file">
+			<path>
+				<fileset dir="../${dataDir}/web/natives/" includes="*.jnlp" />
+			</path>
+			<sequential>
+				<!--
+		  	<srchreplace srcfile="@{file}" destfile="${basedir}/web/myjnlp.jnlp" srch="{CLASSNAME}" rep="${p5Main}" />
+		 -->
+				<propertyregex property="output.file" input="@{file}" regexp=".*\\(.+)" select="\1" override="true" />
+				<echo>${output.file}</echo>
+				<srchreplace srcfile="@{file}" destfile="${basedir}/web/${output.file}" srch="{DESTINATION_URL_DIR}" rep="${DST_PUBLIC_URL}" />
+			</sequential>
+		</for>
+
+		<!-- sign, we don't have to sign the resources jar. -->
+		<echo message="NOTE: you have to create a key/value pair using KeyTool and use it to sign the jar! " />
+		<signit dir="/web/" file="${webjar}" keyname="someKeyName" pass="someLousyPassword" />
+
+	</target>
+
+	<target name="uploadHtml" description="Upates and Uploads only the index.html portion">
+		<mkdir dir="./web/" />
+		<copy todir=".">
+			<fileset dir="../${dataDir}/web" includes="*.html,*.jnlp" />
+		</copy>
+		<!-- replace the {CLASSNAME} with our applet -->
+		<srchreplace srcfile="${basedir}/web_template.html" destfile="${basedir}/web_template2.html" srch="{CLASSNAME}" rep="${p5Main}" />
+		<srchreplace srcfile="${basedir}/myjnlp.jnlp" destfile="${basedir}/web/myjnlp.jnlp" srch="{CLASSNAME}" rep="${p5Main}" />
+		<srchreplace srcfile="${basedir}/web_template2.html" destfile="${basedir}/web_template3.html" srch="{APPLETWIDTH}" rep="640" deletesrch="true" />
+		<srchreplace srcfile="${basedir}/web_template3.html" destfile="${basedir}/web_template4.html" srch="{APPLETHEIGHT}" rep="480" deletesrch="true" />
+		<srchreplace srcfile="${basedir}/web_template4.html" destfile="${basedir}/web_templatefinal.html" srch="{DESTINATION_URL_DIR}" rep="${DST_PUBLIC_URL}" deletesrch="true" />
+		<!-- {CLASSLIBJAR} needs to become our outjar name. Put in /web/index.html -->
+		<srchreplace srcfile="${basedir}/web_templatefinal.html" destfile="${basedir}/web/index.html" srch="{CLASSLIBJAR}" rep="${webjar}" deletesrch="true" />
+	</target>
+
+</project>
