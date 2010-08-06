@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web"
+<jnlp codebase="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web/"
       href="newt-all-noawt.jnlp">
   <information>
     <title>NEWT - New Windowing Toolkit (ALL.NO_AWT)</title>
@@ -14,7 +14,7 @@
   </security>
     <resources>
       <jar href="newt.all-noawt.jar" main="true"/>
-      <extension name="jogl-all-noawt" href="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web/jogl-all-noawt.jnlp" />
+      <extension name="jogl-all-noawt" href="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web//jogl-all-noawt.jnlp" />
     </resources>
 
     <resources os="Windows" arch="x86">

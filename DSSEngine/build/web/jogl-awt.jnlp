@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web"
+<jnlp codebase="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web/"
       href="jogl-awt.jnlp">
   <information>
     <title>Java(tm) Binding to the OpenGL(r) API (AWT)</title>
@@ -16,8 +16,8 @@
       <jar href="jogl.awt.jar" />
       <jar href="jogl.util.awt.jar" download="lazy"/>
 
-      <extension name="jogl-core" href="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web/jogl-core.jnlp" />
-      <extension name="nativewindow-awt" href="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web/nativewindow-awt.jnlp" />
+      <extension name="jogl-core" href="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web//jogl-core.jnlp" />
+      <extension name="nativewindow-awt" href="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web//nativewindow-awt.jnlp" />
     </resources>
   <component-desc />
 </jnlp>

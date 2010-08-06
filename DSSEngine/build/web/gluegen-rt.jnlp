@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web"
+<jnlp codebase="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web/"
       href="gluegen-rt.jnlp">
   <information>
     <title>GlueGen Runtime v2</title>

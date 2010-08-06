@@ -10,9 +10,10 @@ C3E1v_anycolor.cg
 #semantic main.MVP : state.matrix.mvp
 #var float corner : $vin.ATTR2 : ATTR2 : 0 : 1
 #var float4 data : $vin.ATTR3 : ATTR3 : 1 : 1
-#var float2 data2 : $vin.ATTR4 : ATTR4 : 2 : 1
+#var float4 data2 : $vin.ATTR4 : ATTR4 : 2 : 1
 #var float4 data3 : $vin.ATTR5 : ATTR5 : 3 : 1
-#var float4x4 MVP : state.matrix.mvp : c[1], 4 : 4 : 1
+#var float4 colordata : $vin.ATTR6 : ATTR6 : 4 : 1
+#var float4x4 MVP : state.matrix.mvp : c[1], 4 : 5 : 1
 #var float4 main.position : $vout.POSITION : HPOS : -1 : 1
 #var float4 main.color : $vout.COLOR : COL0 : -1 : 1
 #var float2 main.texCoord : $vout.TEXCOORD0 : TEX0 : -1 : 1
@@ -96,6 +97,6 @@ DP4 result.position.z, R0, c[3];
 DP4 result.position.y, R0, c[2];
 DP4 result.position.x, R0, c[1];
 MAD result.texcoord[0].xy, R1, vertex.attrib[5].zwzw, vertex.attrib[5];
-MOV result.color, c[0].y;
+MOV result.color, vertex.attrib[6];
 END
 # 62 instructions, 6 R-regs

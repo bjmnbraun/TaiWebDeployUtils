@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<jnlp codebase="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web"
+<jnlp codebase="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web/"
       href="newt-awt.jnlp">
   <information>
     <title>NEWT - New Windowing Toolkit (AWT)</title>
@@ -14,8 +14,8 @@
   </security>
     <resources>
       <jar href="newt.awt.jar" main="true"/>
-      <extension name="nativewindow-awt" file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web/href="nativewindow-awt.jnlp" />
-      <extension name="newt" href="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web/newt.jnlp" />
+      <extension name="nativewindow-awt" file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web//href="nativewindow-awt.jnlp" />
+      <extension name="newt" href="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web//newt.jnlp" />
     </resources>
   <component-desc />
 </jnlp>

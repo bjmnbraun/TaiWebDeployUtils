@@ -14,7 +14,7 @@
   </security>
     <resources>
       <jar href="nativewindow.all.jar" main="true" />
-      <extension name="gluegen-rt"   href="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web/gluegen-rt.jnlp" />
+      <extension name="gluegen-rt"   href="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web//gluegen-rt.jnlp" />
     </resources>
 
     <resources os="Windows" arch="x86">

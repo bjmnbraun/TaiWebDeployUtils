@@ -20,7 +20,7 @@ final public class Constant implements Variable {
 		this.value = value;
 	}
 
-	public int getValue(int[] ifInt, float[] ifFloat, Object[] ifObject) {
+	public int getValue(int[] ifInt, float[] ifFloat, Object[] ifObject, int thread) {
 		ifObject[0] = value;
 		return 2;
 	}

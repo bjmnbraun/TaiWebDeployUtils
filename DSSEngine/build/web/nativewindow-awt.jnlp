@@ -14,7 +14,7 @@
   </security>
     <resources>
       <jar href="nativewindow.awt.jar" main="true" />
-      <extension name="nativewindow" href="file:///C:\Users\Benjamin\PROGRAMMING\Personal\GithubRepos\DanmakuSimpleScript-Engine---Simulator\BulletHell3\build/web/nativewindow.jnlp" />
+      <extension name="nativewindow" href="file:///C:/Users/Benjamin/PROGRAMMING/Personal/GithubRepos/DanmakuSimpleScript-Engine---Simulator/DSSEngine/build/web//nativewindow.jnlp" />
     </resources>
 
   <component-desc />
