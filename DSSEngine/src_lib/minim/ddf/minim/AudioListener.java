@@ -32,22 +32,21 @@ package ddf.minim;
  * @author Damien Di Fede
  *
  */
-public interface AudioListener
-{
-  /**
-   * Called by the <code>Recordable</code> object this is attached to 
-   * when that object has new samples.
-   * 
-   * @param samp a buffer of samples from a MONO sound stream
-   */
-  void samples(float[] samp);
-  
-  /**
-   * Called by the <code>Recordable</code> object this is attached to
-   * when that object has new samples.
-   * 
-   * @param sampL the left channel of a STEREO sound stream
-   * @param sampR the right channel of a STEREO sound stream
-   */
-  void samples(float[] sampL, float[] sampR);
+public interface AudioListener {
+	/**
+	 * Called by the <code>Recordable</code> object this is attached to 
+	 * when that object has new samples.
+	 * 
+	 * @param samp a buffer of samples from a MONO sound stream
+	 */
+	void samples(float[] samp);
+
+	/**
+	 * Called by the <code>Recordable</code> object this is attached to
+	 * when that object has new samples.
+	 * 
+	 * @param sampL the left channel of a STEREO sound stream
+	 * @param sampR the right channel of a STEREO sound stream
+	 */
+	void samples(float[] sampL, float[] sampR);
 }

@@ -16,7 +16,7 @@ import java.io.*;
 
 import edu.columbia.ee.flavor.*;
 
-public interface StateParsable
-{
-	public void parse(Bitstream bitstream, ParserState parserState) throws IOException;
+public interface StateParsable {
+	public void parse(Bitstream bitstream, ParserState parserState)
+			throws IOException;
 }

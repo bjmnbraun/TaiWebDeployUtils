@@ -17,23 +17,13 @@ import java.io.*;
 import edu.columbia.ee.flavor.*;
 import edu.umd.cfar.lamp.mpeg1.*;
 
-
-class MacroblockType_PFrame implements Parsable
-{
+class MacroblockType_PFrame implements Parsable {
 	private MacroblockType value = new MacroblockType();
 
+	public void parse(Bitstream bitstream) throws IOException {
+		boolean macroblock_quant, macroblock_motion_forward, macroblock_motion_backward, macroblock_pattern, macroblock_intra;
 
-	public void parse(Bitstream bitstream) throws IOException
-	{
-		boolean
-			macroblock_quant,
-			macroblock_motion_forward,
-			macroblock_motion_backward,
-			macroblock_pattern,
-			macroblock_intra;
-		
-		switch (bitstream.nextbits(1))
-		{
+		switch (bitstream.nextbits(1)) {
 		case 1:
 			bitstream.skipbits(1);
 			macroblock_quant = false;
@@ -43,8 +33,7 @@ class MacroblockType_PFrame implements Parsable
 			macroblock_intra = false;
 			break;
 		default:
-			switch (bitstream.nextbits(2))
-			{
+			switch (bitstream.nextbits(2)) {
 			case 1:
 				bitstream.skipbits(2);
 				macroblock_quant = false;
@@ -54,8 +43,7 @@ class MacroblockType_PFrame implements Parsable
 				macroblock_intra = false;
 				break;
 			default:
-				switch (bitstream.nextbits(3))
-				{
+				switch (bitstream.nextbits(3)) {
 				case 1:
 					bitstream.skipbits(3);
 					macroblock_quant = false;
@@ -65,8 +53,7 @@ class MacroblockType_PFrame implements Parsable
 					macroblock_intra = false;
 					break;
 				default:
-					switch (bitstream.nextbits(5))
-					{
+					switch (bitstream.nextbits(5)) {
 					case 3:
 						bitstream.skipbits(5);
 						macroblock_quant = false;
@@ -92,8 +79,7 @@ class MacroblockType_PFrame implements Parsable
 						macroblock_intra = false;
 						break;
 					default:
-						switch (bitstream.nextbits(6))
-						{
+						switch (bitstream.nextbits(6)) {
 						case 1:
 							bitstream.skipbits(6);
 							macroblock_quant = true;
@@ -103,17 +89,19 @@ class MacroblockType_PFrame implements Parsable
 							macroblock_intra = true;
 							break;
 						default:
-							throw new ParsingException("VLC decode for MacroblockType_PFrame failed.");
+							throw new ParsingException(
+									"VLC decode for MacroblockType_PFrame failed.");
 						}
 					}
 				}
 			}
 		}
-		value.setValues(macroblock_quant, macroblock_motion_forward, macroblock_motion_backward, macroblock_pattern, macroblock_intra);
+		value.setValues(macroblock_quant, macroblock_motion_forward,
+				macroblock_motion_backward, macroblock_pattern,
+				macroblock_intra);
 	}
 
-	public MacroblockType getValue()
-	{
+	public MacroblockType getValue() {
 		return value;
 	}
 }

@@ -14,15 +14,12 @@ package edu.umd.cfar.lamp.mpeg1.system;
 
 import edu.umd.cfar.lamp.mpeg1.*;
 
-public class StreamNotFoundException extends MpegException
-{
-	public StreamNotFoundException()
-	{
+public class StreamNotFoundException extends MpegException {
+	public StreamNotFoundException() {
 		super();
 	}
 
-	public StreamNotFoundException(String message)
-	{
+	public StreamNotFoundException(String message) {
 		super(message);
 	}
 }

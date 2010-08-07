@@ -43,119 +43,95 @@ import org.tritonus.share.sampled.file.AudioOutputStream;
  * @author Damien Di Fede
  * 
  */
-final class MStreamRecorder implements SampleRecorder
-{
-  // output stream representing the file being written to
-  private AudioOutputStream aos;
-  // float sample buffer used for converting float samples to bytes
-  private FloatSampleBuffer fsb;
-  private String name;
-  private AudioFileFormat.Type type;
-  private AudioFormat format;
-  private boolean recording;
+final class MStreamRecorder implements SampleRecorder {
+	// output stream representing the file being written to
+	private AudioOutputStream aos;
+	// float sample buffer used for converting float samples to bytes
+	private FloatSampleBuffer fsb;
+	private String name;
+	private AudioFileFormat.Type type;
+	private AudioFormat format;
+	private boolean recording;
 
-  /**
-   * 
-   * @param fileName
-   * @param fileType
-   * @param fileFormat
-   */
-  MStreamRecorder(String fileName, 
-                         AudioFileFormat.Type fileType, 
-                         AudioFormat fileFormat,
-                         int bufferSize)
-  {
-    name = fileName;
-    type = fileType;
-    format = fileFormat;
-    try
-    {
-      aos = AudioSystemShadow.getAudioOutputStream( type, format,
-                              AudioSystem.NOT_SPECIFIED, 
-                              new File(name) );
-    }
-    catch (IOException e)
-    {
-      Minim.error("AudioFileOut.setType: Error obtaining new output stream."
-          + e.getMessage());
-    }
-    fsb = new FloatSampleBuffer(format.getChannels(),
-                                bufferSize,
-                                format.getSampleRate());
-    recording = false;
-  }
-  
-  public String filePath()
-  {
-    return name;
-  }
-  
-  public void beginRecord()
-  {
-    recording = true;
-  }
-  
-  public void endRecord()
-  {
-    recording = false;
-  }
-  
-  public boolean isRecording()
-  {
-    return recording;
-  }
+	/**
+	 * 
+	 * @param fileName
+	 * @param fileType
+	 * @param fileFormat
+	 */
+	MStreamRecorder(String fileName, AudioFileFormat.Type fileType,
+			AudioFormat fileFormat, int bufferSize) {
+		name = fileName;
+		type = fileType;
+		format = fileFormat;
+		try {
+			aos = AudioSystemShadow.getAudioOutputStream(type, format,
+					AudioSystem.NOT_SPECIFIED, new File(name));
+		} catch (IOException e) {
+			Minim
+					.error("AudioFileOut.setType: Error obtaining new output stream."
+							+ e.getMessage());
+		}
+		fsb = new FloatSampleBuffer(format.getChannels(), bufferSize, format
+				.getSampleRate());
+		recording = false;
+	}
 
-  /**
-   * Finishes the recording process by closing the file.
-   */
-  public void save()
-  {
-    try
-    {
-      aos.close();
-    }
-    catch (IOException e)
-    {
-      Minim.error("AudioRecorder.save: An error occurred when trying to save the file:\n"
-                  + e.getMessage());
-    }
-  }
+	public String filePath() {
+		return name;
+	}
 
+	public void beginRecord() {
+		recording = true;
+	}
 
-  public void samples(float[] samp)
-  {
-    if ( recording )
-    {
-      System.arraycopy(samp, 0, fsb.getChannel(0), 0, samp.length);
-      byte[] raw = fsb.convertToByteArray(format);
-      try
-      {
-        aos.write(raw, 0, raw.length);
-      }
-      catch (IOException e)
-      {
-        Minim.error("AudioRecorder: An error occurred while trying to write to the file:\n" +
-                    e.getMessage() );
-      }
-    }
-  }
+	public void endRecord() {
+		recording = false;
+	}
 
-  public void samples(float[] sampL, float[] sampR)
-  {
-    if ( recording )
-    {
-      System.arraycopy(sampL, 0, fsb.getChannel(0), 0, sampL.length);
-      System.arraycopy(sampR, 0, fsb.getChannel(1), 0, sampR.length);
-      byte[] raw = fsb.convertToByteArray(format);
-      try
-      {
-        aos.write(raw, 0, raw.length);
-      }
-      catch (IOException e)
-      {
-        Minim.error("AudioRecorder: An error occurred while trying to write to the file:\n" +
-                    e.getMessage() );
-      }
-    }
-  }
+	public boolean isRecording() {
+		return recording;
+	}
+
+	/**
+	 * Finishes the recording process by closing the file.
+	 */
+	public void save() {
+		try {
+			aos.close();
+		} catch (IOException e) {
+			Minim
+					.error("AudioRecorder.save: An error occurred when trying to save the file:\n"
+							+ e.getMessage());
+		}
+	}
+
+	public void samples(float[] samp) {
+		if (recording) {
+			System.arraycopy(samp, 0, fsb.getChannel(0), 0, samp.length);
+			byte[] raw = fsb.convertToByteArray(format);
+			try {
+				aos.write(raw, 0, raw.length);
+			} catch (IOException e) {
+				Minim
+						.error("AudioRecorder: An error occurred while trying to write to the file:\n"
+								+ e.getMessage());
+			}
+		}
+	}
+
+	public void samples(float[] sampL, float[] sampR) {
+		if (recording) {
+			System.arraycopy(sampL, 0, fsb.getChannel(0), 0, sampL.length);
+			System.arraycopy(sampR, 0, fsb.getChannel(1), 0, sampR.length);
+			byte[] raw = fsb.convertToByteArray(format);
+			try {
+				aos.write(raw, 0, raw.length);
+			} catch (IOException e) {
+				Minim
+						.error("AudioRecorder: An error occurred while trying to write to the file:\n"
+								+ e.getMessage());
+			}
+		}
+	}
 }

@@ -21,9 +21,10 @@ import TaiGameCore.TaiVBO;
 import TaiScript.parsing.TaiScriptEditor;
 import TaiScript.parsing.TaiScriptTxtInfo;
 
-
-public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletGame$1Engine$ABasicEngine{
-	public BulletGame$1Engine$L1$1$OpenglTextRenderer(JFrame holder, PApplet hold) {
+public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
+		BulletGame$1Engine$ABasicEngine {
+	public BulletGame$1Engine$L1$1$OpenglTextRenderer(JFrame holder,
+			PApplet hold) {
 		super(holder, hold);
 	}
 
@@ -31,12 +32,17 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 		private Rectangle2D.Float textR;
 
 		public EditorTextSheet(Rectangle2D.Float usableSpace, int linesToShow) {
-			this(usableSpace,linesToShow,true,true,true,1024,16);
+			this(usableSpace, linesToShow, true, true, true, 1024, 16);
 		}
-		public EditorTextSheet(Rectangle2D.Float usableSpace, int linesToShow, boolean b,boolean c, boolean d) {
-			this(usableSpace,linesToShow,b,c,d,1024,16);
+
+		public EditorTextSheet(Rectangle2D.Float usableSpace, int linesToShow,
+				boolean b, boolean c, boolean d) {
+			this(usableSpace, linesToShow, b, c, d, 1024, 16);
 		}
-		public EditorTextSheet(Rectangle2D.Float usableSpace, int linesToShow, boolean drawBG, boolean editable, boolean showsemicolon, int FontStorageSize, int numberOfGlyphsSqrt) {
+
+		public EditorTextSheet(Rectangle2D.Float usableSpace, int linesToShow,
+				boolean drawBG, boolean editable, boolean showsemicolon,
+				int FontStorageSize, int numberOfGlyphsSqrt) {
 			RowHeight = 1.f / linesToShow; // .05f for 20 lines works pretty
 			this.drawBG = drawBG;
 			this.editable = editable;
@@ -46,7 +52,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			tse = new TaiScriptEditor("");
 			this.linesToShow = linesToShow;
 			renderedGlyphLocations = new ArrayList[linesToShow];
-			for (int k = 0; k < renderedGlyphLocations.length; renderedGlyphLocations[k] = new ArrayList(), k++);
+			for (int k = 0; k < renderedGlyphLocations.length; renderedGlyphLocations[k] = new ArrayList(), k++)
+				;
 			rowNoise = new float[linesToShow];
 			long myNoiseSeed = 109243;
 			g.noiseSeed(myNoiseSeed);
@@ -58,7 +65,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			//Shader initialization
 			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
 			myShaders = FILE_SYSTEM.loadShader("Shader2", gl);
-			FontGlyphStorage = new TaiImgMap(numberOfGlyphsSqrt * numberOfGlyphsSqrt, FontStorageSize);
+			FontGlyphStorage = new TaiImgMap(numberOfGlyphsSqrt
+					* numberOfGlyphsSqrt, FontStorageSize);
 			TextBuffer = new TaiVBO(gl);
 			for (Shader1VertShader attrib : Shader1VertShader.values()) {
 				TextBuffer.registerAttrib(attrib, attrib.Type,
@@ -66,10 +74,10 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			}
 		}
 
-
-		public void useTSE(TaiScriptEditor target){
+		public void useTSE(TaiScriptEditor target) {
 			this.tse = target;
-			WindowLine = Math.max(0,Math.min(tse.CaretLine,tse.Editing.size()-linesToShow));
+			WindowLine = Math.max(0, Math.min(tse.CaretLine, tse.Editing.size()
+					- linesToShow));
 			isTextModified = true;
 			textWasModifiedThisFrame = true;
 		}
@@ -89,6 +97,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 		private float GL_X = 0, GL_Y = 0; // UPDATE ON ALL TRANSLATIONS.
 
 		private boolean cleanedUp = false;
+
 		public void cleanup() {
 			cleanedUp = true;
 			// FontGlyphStorage.cleanup(); PImages are cleanedup via finalize.
@@ -97,39 +106,42 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			FontGlyphStorage = null;
 			TextBuffer = null;
 		}
-		public void finalize(){
-			if (!cleanedUp){
-				throw new RuntimeException("I was not cleaned up (EditTextScreeN)!!!"+" "+tse.Editing);
+
+		public void finalize() {
+			if (!cleanedUp) {
+				throw new RuntimeException(
+						"I was not cleaned up (EditTextScreeN)!!!" + " "
+								+ tse.Editing);
 			}
 		}
 
 		TaiShaders myShaders;
 		TaiImgMap FontGlyphStorage;
 		TaiVBO TextBuffer;
-		
+
 		public boolean hasMouseFocus = true;
 
 		public void draw() {
 			mouseLoc = new float[] {
 					(g.mouseX / (float) g.width - textR.x)
-					/ (float) textR.width,
+							/ (float) textR.width,
 					(g.mouseY / (float) g.height - textR.y)
-					/ (float) textR.height };
+							/ (float) textR.height };
 
 			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
 			// isTextModified |= g.mousePressed;
 			isTextModified |= isResized; // The coordinates change.
 			if (tse.CaretLine > WindowLine + linesToShow - 1) {
 				isTextModified = true; // New perspectives!
-				WindowLine+=tse.CaretLine-(WindowLine + linesToShow - 1);
+				WindowLine += tse.CaretLine - (WindowLine + linesToShow - 1);
 			}
 			if (tse.CaretLine < WindowLine) {
 				isTextModified = true;// New perspectives!
-				WindowLine-=WindowLine-tse.CaretLine;
+				WindowLine -= WindowLine - tse.CaretLine;
 			}
 			float textDistance = 4; // Sadly, my text renderer doesn't support
 			// perspective yet.
-			if (drawBG){
+			if (drawBG) {
 				g.pushMatrix();
 				for (int k = WindowLine; k < WindowLine + linesToShow; k++) {
 					float oldH = -textDistance;// sin(k/5f)*2-4;
@@ -177,32 +189,35 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			myShaders.switchToShader(myShaders);
 			boolean oldVal = ((PGraphicsOpenGL) g.g).MAKE_MIPMAPS;
 			((PGraphicsOpenGL) g.g).MAKE_MIPMAPS = false;
-			(((PGraphicsOpenGL) g.g)).bindTexture(FontGlyphStorage.getCombinedImage());
+			(((PGraphicsOpenGL) g.g)).bindTexture(FontGlyphStorage
+					.getCombinedImage());
 			((PGraphicsOpenGL) g.g).MAKE_MIPMAPS = oldVal;
 			// int id =
 			// ((PGraphicsOpenGL.ImageCache)smiley.getCache(g.g)).tindex;
 			gl.glEnable(GL.GL_TEXTURE_2D);
-			TextBuffer.CurrentColor[0] = g.red(g.g.fillColor)/255.f;
-			TextBuffer.CurrentColor[1] = g.green(g.g.fillColor)/255.f;
-			TextBuffer.CurrentColor[2] = g.blue(g.g.fillColor)/255.f;
+			TextBuffer.CurrentColor[0] = g.red(g.g.fillColor) / 255.f;
+			TextBuffer.CurrentColor[1] = g.green(g.g.fillColor) / 255.f;
+			TextBuffer.CurrentColor[2] = g.blue(g.g.fillColor) / 255.f;
 			TextBuffer.drawQueuedElements();
 			gl.glDisable(GL.GL_TEXTURE_2D);
 			myShaders.switchToShader(null);
 			screen2D();
-			if (arrowScroll!=null){
-				float rh = Math.max(RowHeight,.11f);
+			if (arrowScroll != null) {
+				float rh = Math.max(RowHeight, .11f);
 				float arrowWidth = rh, arrowHeight = rh * 1.8f;
 				if (showScrollUpArrow) {
 					g.pushMatrix();
 					g.translate(1 - arrowWidth, arrowHeight);
-					g.scale(1,-1);
-					g.image(FILE_SYSTEM.getImg(arrowScroll), 0f, 0f, arrowWidth, arrowHeight);
+					g.scale(1, -1);
+					g.image(FILE_SYSTEM.getImg(arrowScroll), 0f, 0f,
+							arrowWidth, arrowHeight);
 					g.popMatrix();
 				}
 				if (showScrollDownArrow) {
 					g.pushMatrix();
 					g.translate(1 - arrowWidth, 1 - arrowHeight);
-					g.image(FILE_SYSTEM.getImg(arrowScroll), 0f, 0f, arrowWidth, arrowHeight);
+					g.image(FILE_SYSTEM.getImg(arrowScroll), 0f, 0f,
+							arrowWidth, arrowHeight);
 					g.popMatrix();
 				}
 			}
@@ -210,9 +225,11 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 
 		private float[] mouseLoc;
 		public String arrowScroll = null;
-		public void setArrowScrollGraphic(String arrow){
+
+		public void setArrowScrollGraphic(String arrow) {
 			arrowScroll = arrow;
 		}
+
 		/**
 		 * Pooled float arrays for ngonAddition
 		 */
@@ -221,9 +238,9 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 		private float[] textRow2 = new float[4];
 		private float[] textRow3 = new float[4];
 		private float[] textRow4 = new float[4];
-		private float[] writeFloats(float[] arr, float ... values){
-			for(int k = 0; k < values.length; k++)
-			{
+
+		private float[] writeFloats(float[] arr, float... values) {
+			for (int k = 0; k < values.length; k++) {
 				arr[k] = values[k];
 			}
 			return arr;
@@ -233,10 +250,10 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 				final boolean addToShader, final float[] Txtcolor) {
 			long now = System.nanoTime();
 
-			GL2 gl = ((PGraphicsOpenGL)g.g).gl;
+			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
 			int bestIndex = -1;
-			float[] highlightColor = new float[] { 31 / 255f,
-					79 / 255f, 179 / 255f };
+			float[] highlightColor = new float[] { 31 / 255f, 79 / 255f,
+					179 / 255f };
 			if (addToShader) {
 				// Clear location cache
 				clearXcoordinates(k);
@@ -254,8 +271,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 					lineEnd = true;
 					skipDraw = true;
 				}
-				if (tse.CaretLine == k
-						&& tse.CaretPosition == charIndex 
+				if (tse.CaretLine == k && tse.CaretPosition == charIndex
 						&& selectable) {
 					gl.glColor3f(255, 0, 0);
 					gl.glBegin(gl.GL_LINES);
@@ -267,7 +283,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 					c = ';';
 					lineEnd = true;
 					//Alright, did this line end with {, or }?
-					if (lastChar=='{' || lastChar=='}'){
+					if (lastChar == '{' || lastChar == '}') {
 						skipDraw = true;
 					}
 					if (dontDrawSemicolons) {
@@ -277,25 +293,26 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 				float leftBound = GL_X;
 				if (!skipDraw) {
 					PFont TextFontTmp = TextFont;
-					if (TextFontTmp==null){
+					if (TextFontTmp == null) {
 						/**
 						 * IF it can't find it, it returns a font that only
 						 * contains '?'
 						 **/
 						char lookup = c;
-						if (Character.isWhitespace(c)){
+						if (Character.isWhitespace(c)) {
 							lookup = 'a';
 						}
-						TextFontTmp = FILE_SYSTEM.getPFontFor(defaultToFont, lookup, defaultToFontSize);
+						TextFontTmp = FILE_SYSTEM.getPFontFor(defaultToFont,
+								lookup, defaultToFontSize);
 					}
 
 					int index = -1;
 					int multiplyLetterWidth = 1;
-					if (Character.isWhitespace(c)){
+					if (Character.isWhitespace(c)) {
 						index = TextFontTmp.index('a');
 						addToShaderTmp = false;
 						//Use the size of the letter 'a'
-						if (c=='\t'){
+						if (c == '\t') {
 							//Workaround for tab
 							multiplyLetterWidth = 4;
 						}
@@ -305,7 +322,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 							index = TextFontTmp.index('?');
 						}
 					}
-					if (index == -1){
+					if (index == -1) {
 						index = 0;
 					}
 					float high = (float) TextFontTmp.height[index];
@@ -318,25 +335,27 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 					 */
 					float baseLine = TextFontTmp.size + 1;
 					float yscl = RowHeight * TextFontTmp.size / 725 * TXTSCL;
-					float charW = .06f / (textR.width) * TextFontTmp.size / 725 * TXTSCL / NSPH;
+					float charW = .06f / (textR.width) * TextFontTmp.size / 725
+							* TXTSCL / NSPH;
 					// System.out.println(charW);
 					// System.out.println(xscl+" "+yscl);
 
 					// Careful, charWToMove must aliased
 					float charWToMove = (TextFontTmp.setWidth[index]) * charW;
 					charWToMove = ((int) (charWToMove * currentViewPortWidth))
-					/ (float) currentViewPortWidth * multiplyLetterWidth;
+							/ (float) currentViewPortWidth
+							* multiplyLetterWidth;
 
-					if (selectable && tse.Selection.isInsideRegion(k, charIndex)) {
+					if (selectable
+							&& tse.Selection.isInsideRegion(k, charIndex)) {
 						// Single-character highlights are slow.
 						if (tse.Selection.LineBegin == k
 								|| tse.Selection.LineEnd == k) {
-							gl.glColor3f(highlightColor[0],
-									highlightColor[1],
+							gl.glColor3f(highlightColor[0], highlightColor[1],
 									highlightColor[2]);
 							gl.glBegin(gl.GL_QUADS);
 							gl.glVertex3f(0 + GL_X, 0, oldH);
-							gl.glVertex3f(charWToMove + GL_X, 0, oldH); 
+							gl.glVertex3f(charWToMove + GL_X, 0, oldH);
 							gl.glVertex3f(charWToMove + GL_X, RowHeight, newH);
 							gl.glVertex3f(0 + GL_X, RowHeight, newH);
 							gl.glEnd();
@@ -351,53 +370,43 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 
 						PImage img = TextFontTmp.images[index];
 						// Calculate the image positiosn
-						float imgWidth = ((float) bwidth) / FontGlyphStorage.width;
-						float imgHeight = ((float) high) / FontGlyphStorage.height;
+						float imgWidth = ((float) bwidth)
+								/ FontGlyphStorage.width;
+						float imgHeight = ((float) high)
+								/ FontGlyphStorage.height;
 
 						//PERFORMANCE!
 						float[] position = textRow0;
-						FontGlyphStorage.addImage(img,position);
-						float[] toMapTo = writeFloats( textRow1,
-								charLeft,
-								dispHRatio, charRight, bottomHRatio );
-						float[] center = writeFloats( textRow2,
+						FontGlyphStorage.addImage(img, position);
+						float[] toMapTo = writeFloats(textRow1, charLeft,
+								dispHRatio, charRight, bottomHRatio);
+						float[] center = writeFloats(textRow2,
 								(toMapTo[0] + toMapTo[2]) / 2,
-								(toMapTo[1] + toMapTo[3]) / 2 );
-						float[] sizes = writeFloats( textRow3,
-								toMapTo[2] - toMapTo[0],
-								toMapTo[3] - toMapTo[1] );
+								(toMapTo[1] + toMapTo[3]) / 2);
+						float[] sizes = writeFloats(textRow3, toMapTo[2]
+								- toMapTo[0], toMapTo[3] - toMapTo[1]);
 						// Texture info.
-						float[] chunk = writeFloats( textRow4,
-								position[0], position[1], imgWidth, imgHeight );
-						
+						float[] chunk = writeFloats(textRow4, position[0],
+								position[1], imgWidth, imgHeight);
+
 						//ADD!
-						TextBuffer.addNgon(4,
-								Shader1VertShader.Center_X, 
-								GL_X + center[0],
-								Shader1VertShader.Center_Y, 
-								GL_Y + center[1],
-								Shader1VertShader.RectWidth, 
-								sizes[0],
-								Shader1VertShader.RectHeight, 
-								sizes[1],
-								Shader1VertShader.Rotation, 
-								0f,
-								Shader1VertShader.X_TexOffset,
-								chunk[0],
-								Shader1VertShader.Y_TexOffset,
-								chunk[1], 
-								Shader1VertShader.TexScaleX,
-								chunk[2], 
-								Shader1VertShader.TexScaleY,
-								chunk[3]
-								      // Shader1VertShader.tint, Txtcolor
-						);
+						TextBuffer.addNgon(4, Shader1VertShader.Center_X, GL_X
+								+ center[0], Shader1VertShader.Center_Y, GL_Y
+								+ center[1], Shader1VertShader.RectWidth,
+								sizes[0], Shader1VertShader.RectHeight,
+								sizes[1], Shader1VertShader.Rotation, 0f,
+								Shader1VertShader.X_TexOffset, chunk[0],
+								Shader1VertShader.Y_TexOffset, chunk[1],
+								Shader1VertShader.TexScaleX, chunk[2],
+								Shader1VertShader.TexScaleY, chunk[3]
+						// Shader1VertShader.tint, Txtcolor
+								);
 					}
 					GL_X += charWToMove; // Getting rid of matrix
 					// operations in these
 					// loops!!!
 					// Next char:
-					if (!Character.isWhitespace(c)){
+					if (!Character.isWhitespace(c)) {
 						lastChar = c;
 					}
 				}
@@ -407,7 +416,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 						// Fill in whole line.
 						offsetLeft = LEFT_TXT_INDENT;
 					}
-					if (selectable && tse.Selection.isInsideRegion(k, charIndex)) { // Rest-of-line
+					if (selectable
+							&& tse.Selection.isInsideRegion(k, charIndex)) { // Rest-of-line
 						// highlight
 						gl.glColor3f(highlightColor[0], highlightColor[1],
 								highlightColor[2]);
@@ -423,12 +433,10 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 						gl.glEnd();
 					}
 				}
-				float[] topBotBound = new float[] { GL_Y,
-						GL_Y + RowHeight };
+				float[] topBotBound = new float[] { GL_Y, GL_Y + RowHeight };
 				// Mouse over?
-				if (mouseLoc[0] >= leftBound
-						&& mouseLoc[1] >= topBotBound[0]
-						                              && mouseLoc[1] < topBotBound[1]) {
+				if (mouseLoc[0] >= leftBound && mouseLoc[1] >= topBotBound[0]
+						&& mouseLoc[1] < topBotBound[1]) {
 					// System.out.println(charIndex+" "+GL_Y+" "+GL_X+" "+Arrays.toString(mouseLoc)+" "+Arrays.toString(topBotBound));
 					bestIndex = charIndex;
 				}
@@ -445,8 +453,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 							tse.CaretPosition = bestIndex;
 							draggingSelection = 0.1;
 							beginDraggingSelection = System.nanoTime();
-							tse.Selection = new TaiScriptTxtInfo(k,
-									bestIndex, k, bestIndex);
+							tse.Selection = new TaiScriptTxtInfo(k, bestIndex,
+									k, bestIndex);
 							tse.Selection.TemporaryDisable = true;
 						}
 					}
@@ -462,9 +470,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 							}
 						}
 						if (!tse.Selection.TemporaryDisable) {
-							tse.Selection = new TaiScriptTxtInfo(
-									tse.CaretLine, tse.CaretPosition,
-									k, bestIndex);
+							tse.Selection = new TaiScriptTxtInfo(tse.CaretLine,
+									tse.CaretPosition, k, bestIndex);
 						}
 					}
 				} else {
@@ -493,7 +500,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 		public boolean textWasModifiedThisFrame = true;
 
 		public void keyPressed(KeyEvent e) {
-			if (!editable && !selectable){
+			if (!editable && !selectable) {
 				return;
 			}
 			if (e.getID() == KeyEvent.KEY_RELEASED) {
@@ -507,14 +514,14 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 						tse.copy();
 						break;
 					case KeyEvent.VK_X:
-						if (!tse.Selection.isEmpty()){
+						if (!tse.Selection.isEmpty()) {
 							tse.copy();
 							tse.backspace();
 							isTextModified = true;
 						}
 						break;
 					case KeyEvent.VK_V:
-						if (editable){
+						if (editable) {
 							tse.paste();
 							isTextModified = true;
 						}
@@ -561,7 +568,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 					// used.
 					switch (e.getKeyCode()) {
 					case KeyEvent.VK_END:
-						tse.CaretPosition = tse.Editing.get(tse.CaretLine).length()-1;
+						tse.CaretPosition = tse.Editing.get(tse.CaretLine)
+								.length() - 1;
 						break;
 					case KeyEvent.VK_HOME:
 						tse.CaretPosition = 0;
@@ -583,13 +591,13 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 							tse.caretUp();
 						break;
 					case KeyEvent.VK_PAGE_DOWN:
-						if (arrowKeysText.isTypeTime(KeyEvent.VK_PAGE_DOWN)){
+						if (arrowKeysText.isTypeTime(KeyEvent.VK_PAGE_DOWN)) {
 							for (int k = 0; k < linesToShow; k++)
 								tse.caretDown();
 						}
 						break;
 					case KeyEvent.VK_PAGE_UP:
-						if (arrowKeysText.isTypeTime(KeyEvent.VK_PAGE_UP)){
+						if (arrowKeysText.isTypeTime(KeyEvent.VK_PAGE_UP)) {
 							for (int k = 0; k < linesToShow; k++)
 								tse.caretUp();
 						}
@@ -619,20 +627,21 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			} else {
 			}
 		}
+
 		/**
 		 * Sets the selection to be the empty selection, at the current
 		 * tse.CaretLine, tse.CaretPosition
 		 */
-		public void singleWidthSelect(){
+		public void singleWidthSelect() {
 			tse.Selection = new TaiScriptTxtInfo(tse.CaretLine,
-					tse.CaretPosition, tse.CaretLine,
-					tse.CaretPosition);
+					tse.CaretPosition, tse.CaretLine, tse.CaretPosition);
 			tse.Selection.TemporaryDisable = true;
 		}
 
 		private PressTypeThreshold arrowKeysText = new PressTypeThreshold(.2,
 				.03);
 		private int WindowLine = 0;
+
 		public int getLinesToShow() {
 			return linesToShow;
 		}
@@ -659,7 +668,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 		public String getRowText(int i) {
 			//Hmm, should I not return the line end char?
 			String value = tse.Editing.get(i);
-			value = value.substring(0,value.length()-1); //LINE_END is a character
+			value = value.substring(0, value.length() - 1); //LINE_END is a character
 			return value;
 		}
 
@@ -699,38 +708,51 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 
 		private ArrayList<Float>[] renderedGlyphLocations;// linesToShow
 
-		public void setTextFont(PFont font){
+		public void setTextFont(PFont font) {
 			TextFont = font;
 		}
-		public void scaleText(float scale){
+
+		public void scaleText(float scale) {
 			TXTSCL = scale;
 		}
+
 		public void setSelectable(boolean b) {
 			selectable = b;
 		}
 	}
+
 	public class TaiTextBox {
 		public EditorTextSheet ets;
+
 		public EditorTextSheet getText() {
 			return ets;
 		}
+
 		public Rectangle2D.Float area;
-		public TaiTextBox(double x, double y, double w, double h, int numLines){
-			this(new Rectangle2D.Float((float)x,(float)y,(float)w,(float)h),numLines);
+
+		public TaiTextBox(double x, double y, double w, double h, int numLines) {
+			this(new Rectangle2D.Float((float) x, (float) y, (float) w,
+					(float) h), numLines);
 		}
-		public TaiTextBox(Rectangle2D.Float area, int numLines){
-			this(area,numLines,false);
+
+		public TaiTextBox(Rectangle2D.Float area, int numLines) {
+			this(area, numLines, false);
 		}
-		public TaiTextBox(Rectangle2D.Float area, int numLines, boolean editable){
-			this(area,numLines,editable,256,8);
+
+		public TaiTextBox(Rectangle2D.Float area, int numLines, boolean editable) {
+			this(area, numLines, editable, 256, 8);
 		}
-		public TaiTextBox(Rectangle2D.Float area, int numLines, boolean editable, int size, int numGlypsSqrt){
+
+		public TaiTextBox(Rectangle2D.Float area, int numLines,
+				boolean editable, int size, int numGlypsSqrt) {
 			this.area = area;
-			if (!editable){
-				ets = new EditorTextSheet(area,numLines,false,false,false,size,numGlypsSqrt);
+			if (!editable) {
+				ets = new EditorTextSheet(area, numLines, false, false, false,
+						size, numGlypsSqrt);
 				ets.setSelectable(false);
 			} else {
-				ets = new EditorTextSheet(area,numLines,false,true,false,size,numGlypsSqrt);
+				ets = new EditorTextSheet(area, numLines, false, true, false,
+						size, numGlypsSqrt);
 				ets.setSelectable(true);
 			}
 
@@ -740,27 +762,36 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			this.editable = editable;
 			postConstructor();
 		}
-		public void setArea(Rectangle2D.Float area){
+
+		public void setArea(Rectangle2D.Float area) {
 			this.area = area;
 			ets.textR = area;
 		}
+
 		private boolean editable;
-		public boolean isEditable(){
+
+		public boolean isEditable() {
 			return editable;
 		}
-		public void postConstructor(){
+
+		public void postConstructor() {
 
 		}
+
 		public void useFont(PFont arcadeFont) {
 			ets.setTextFont(arcadeFont);
 		}
+
 		private float txtScl = 1;
-		public void setTextScale(float scl){
+
+		public void setTextScale(float scl) {
 			txtScl = scl;
 		}
+
 		private String lastString = "";
+
 		public void setText(String string) {
-			if (lastString.equals(string)){
+			if (lastString.equals(string)) {
 				return;
 			}
 			//else
@@ -769,32 +800,36 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			ets.tse.newFile();
 			ets.tse.insertText(string);
 		}
-		public void setTextRow(String row, int rowNum){
-			if (ets.getRowText(rowNum).equals(row)){ //Can't do equals; line ending char
+
+		public void setTextRow(String row, int rowNum) {
+			if (ets.getRowText(rowNum).equals(row)) { //Can't do equals; line ending char
 				return;
 			}
 			//else
 			ets.isTextModified = true;
-			ets.tse.setLine(row,rowNum);
+			ets.tse.setLine(row, rowNum);
 		}
-		public void draw(){
+
+		public void draw() {
 			viewport(area.x, area.y, area.width, area.height);
-			if (false){
+			if (false) {
 				outlineViewport();
 			}
 			ets.scaleText(txtScl);
 			ets.draw();
-			viewport(0,0,1,1);
+			viewport(0, 0, 1, 1);
 		}
-		public void cleanup(){
+
+		public void cleanup() {
 			ets.cleanup();
 			removeSubKeyListener(ets);
 		}
 	}
 
-	public class SaveGameDialog extends ModalDialog{
-		public SaveGameDialog(BulletGameScreen parent, final Runnable doAfter, GameDataBase saveObj, String arrowToShow) {
-			super(parent, new ModalDialogCallback<SaveGameDialog>(){
+	public class SaveGameDialog extends ModalDialog {
+		public SaveGameDialog(BulletGameScreen parent, final Runnable doAfter,
+				GameDataBase saveObj, String arrowToShow) {
+			super(parent, new ModalDialogCallback<SaveGameDialog>() {
 				public void dialogFinished(SaveGameDialog self) {
 					self.cleanup();
 					doAfter.run();
@@ -803,44 +838,48 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 			hash = saveObj.hashToString();
 			StringBuffer neoHash = new StringBuffer();
 			int count = 0;
-			for(char k : hash.toCharArray()){
+			for (char k : hash.toCharArray()) {
 				neoHash.append(k);
-				if (count++%48==47){
+				if (count++ % 48 == 47) {
 					neoHash.append("\n");
 				}
 			}
 			hash = neoHash.toString();
 			//Certain number of 
-			area = new Rectangle2D.Float(.1f,.05f,.8f,.8f);
-			innerArea = new Rectangle2D.Float(0f,.2f,1f,.79f);
+			area = new Rectangle2D.Float(.1f, .05f, .8f, .8f);
+			innerArea = new Rectangle2D.Float(0f, .2f, 1f, .79f);
 			scaleRect(innerArea, area);
-			ets = new TaiTextBox(innerArea,24);
+			ets = new TaiTextBox(innerArea, 24);
 			ets.setTextScale(.4f);
 			ets.ets.setSelectable(true);
-			ets.ets.setTextRestrictions(0,0);
+			ets.ets.setTextRestrictions(0, 0);
 			ets.setText(hash);
 			ets.ets.setArrowScrollGraphic(arrowToShow);
 			ets.ets.tse.selectAll();
 
-			Rectangle2D.Float topArea = new Rectangle2D.Float(0f,0f,1f,.2f);
+			Rectangle2D.Float topArea = new Rectangle2D.Float(0f, 0f, 1f, .2f);
 			scaleRect(topArea, area);
-			display = new TaiTextBox(topArea,2);
+			display = new TaiTextBox(topArea, 2);
 			display.setTextScale(.6f);
-			display.setText("Your save game is below. Copy it to your clipboard (make sure \nyou select all of it, try CTRL+A), and press ESCAPE to return.");
+			display
+					.setText("Your save game is below. Copy it to your clipboard (make sure \nyou select all of it, try CTRL+A), and press ESCAPE to return.");
 		}
-		public void cleanup(){
+
+		public void cleanup() {
 			display.cleanup();
 			ets.cleanup();
 		}
+
 		private Rectangle2D.Float area;
 		private Rectangle2D.Float innerArea;
 		private String hash;
 		private TaiTextBox ets;
 		private TaiTextBox display;
-		public boolean drawDialog(){
+
+		public boolean drawDialog() {
 			viewport(area);
 			g.fill(0);
-			g.rect(0,0,1,1);
+			g.rect(0, 0, 1, 1);
 			g.fill(255);
 			display.draw();
 			ets.draw();
@@ -859,14 +898,15 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends BulletG
 		texPlace.width *= dialogPlace.width;
 		texPlace.height *= dialogPlace.height;
 	}
+
 	/**
 	 * UnMaps a rectangle (0,0,- 1, 1) onto another.
 	 * TexPlace is (first parameter) adjusted
 	 */
 	public void unScaleRect(Rectangle2D.Float texPlace,
 			Rectangle2D.Float dialogPlace) {
-		texPlace.x = (texPlace.x - dialogPlace.x)/dialogPlace.width;
-		texPlace.y = (texPlace.y - dialogPlace.y)/dialogPlace.height;
+		texPlace.x = (texPlace.x - dialogPlace.x) / dialogPlace.width;
+		texPlace.y = (texPlace.y - dialogPlace.y) / dialogPlace.height;
 		texPlace.width /= dialogPlace.width;
 		texPlace.height /= dialogPlace.height;
 	}

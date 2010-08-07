@@ -17,22 +17,17 @@ import java.io.*;
 import edu.columbia.ee.flavor.*;
 import edu.umd.cfar.lamp.mpeg1.*;
 
-class MacroblockPattern implements Parsable
-{
+class MacroblockPattern implements Parsable {
 	private int value = 0;
 
-	
-	public void parse(Bitstream bitstream) throws IOException
-	{
-		switch (bitstream.nextbits(3))
-		{
+	public void parse(Bitstream bitstream) throws IOException {
+		switch (bitstream.nextbits(3)) {
 		case 7:
 			bitstream.skipbits(3);
 			value = 60;
 			break;
 		default:
-			switch (bitstream.nextbits(4))
-			{
+			switch (bitstream.nextbits(4)) {
 			case 13:
 				bitstream.skipbits(4);
 				value = 4;
@@ -50,8 +45,7 @@ class MacroblockPattern implements Parsable
 				value = 32;
 				break;
 			default:
-				switch (bitstream.nextbits(5))
-				{
+				switch (bitstream.nextbits(5)) {
 				case 19:
 					bitstream.skipbits(5);
 					value = 12;
@@ -101,8 +95,7 @@ class MacroblockPattern implements Parsable
 					value = 62;
 					break;
 				default:
-					switch (bitstream.nextbits(6))
-					{
+					switch (bitstream.nextbits(6)) {
 					case 15:
 						bitstream.skipbits(6);
 						value = 24;
@@ -120,8 +113,7 @@ class MacroblockPattern implements Parsable
 						value = 63;
 						break;
 					default:
-						switch (bitstream.nextbits(7))
-						{
+						switch (bitstream.nextbits(7)) {
 						case 23:
 							bitstream.skipbits(7);
 							value = 5;
@@ -155,8 +147,7 @@ class MacroblockPattern implements Parsable
 							value = 34;
 							break;
 						default:
-							switch (bitstream.nextbits(8))
-							{
+							switch (bitstream.nextbits(8)) {
 							case 31:
 								bitstream.skipbits(8);
 								value = 7;
@@ -270,8 +261,7 @@ class MacroblockPattern implements Parsable
 								value = 58;
 								break;
 							default:
-								switch (bitstream.nextbits(9))
-								{
+								switch (bitstream.nextbits(9)) {
 								case 7:
 									bitstream.skipbits(9);
 									value = 31;
@@ -297,7 +287,8 @@ class MacroblockPattern implements Parsable
 									value = 39;
 									break;
 								default:
-									throw new ParsingException("VLC decode for MacroblockPattern failed.");
+									throw new ParsingException(
+											"VLC decode for MacroblockPattern failed.");
 								}
 							}
 						}
@@ -307,8 +298,7 @@ class MacroblockPattern implements Parsable
 		}
 	}
 
-	public int getValue()
-	{
+	public int getValue() {
 		return value;
 	}
 }

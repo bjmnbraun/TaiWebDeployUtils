@@ -40,7 +40,7 @@ public class Mpeg1SystemStream extends InputStream {
 	}
 
 	public Mpeg1SystemStream(File file, SystemIndex systemIndex)
-		throws IOException {
+			throws IOException {
 		this(file);
 		setSystemIndex(systemIndex);
 	}
@@ -51,26 +51,19 @@ public class Mpeg1SystemStream extends InputStream {
 		out.close();
 	}
 
-	public void writeIndex(OutputStream out)
-		throws IOException, MpegException {
+	public void writeIndex(OutputStream out) throws IOException, MpegException {
 		index();
 		systemIndex.writeIndex(new DataOutputStream(out));
 	}
 
-	public void writeIndex(
-		Component parentComponent,
-		Object message,
-		File file)
-		throws IOException, MpegException {
+	public void writeIndex(Component parentComponent, Object message, File file)
+			throws IOException, MpegException {
 		index(parentComponent, message);
 		writeIndex(file);
 	}
 
-	public void writeIndex(
-		Component parentComponent,
-		Object message,
-		OutputStream out)
-		throws IOException, MpegException {
+	public void writeIndex(Component parentComponent, Object message,
+			OutputStream out) throws IOException, MpegException {
 		index(parentComponent, message);
 		writeIndex(out);
 	}
@@ -126,27 +119,20 @@ public class Mpeg1SystemStream extends InputStream {
 	public void index() throws IOException {
 		if (!indexed()) {
 			systemIndex = new SystemIndex();
-			new SystemStream().index(
-				new Bitstream(
-					new BufferedInputStream(new FileInputStream(file))),
-				new IndexerState(),
-				systemIndex);
+			new SystemStream().index(new Bitstream(new BufferedInputStream(
+					new FileInputStream(file))), new IndexerState(),
+					systemIndex);
 		}
 	}
 
 	public void index(Component parentComponent, Object message)
-		throws IOException {
+			throws IOException {
 		if (!indexed()) {
 			systemIndex = new SystemIndex();
-			new SystemStream().index(
-				new Bitstream(
-					new BufferedInputStream(
-						new ProgressMonitorInputStream(
-							parentComponent,
-							message,
-							new FileInputStream(file)))),
-				new IndexerState(),
-				systemIndex);
+			new SystemStream().index(new Bitstream(new BufferedInputStream(
+					new ProgressMonitorInputStream(parentComponent, message,
+							new FileInputStream(file)))), new IndexerState(),
+					systemIndex);
 		}
 	}
 
@@ -158,8 +144,8 @@ public class Mpeg1SystemStream extends InputStream {
 		seek(bytePosition, currentStreamID);
 	}
 
-	public void seek(long bytePosition, int stream_id)
-		throws IOException, MpegException {
+	public void seek(long bytePosition, int stream_id) throws IOException,
+			MpegException {
 		index();
 		setStream(stream_id);
 		streamPointer = bytePosition;
@@ -189,8 +175,8 @@ public class Mpeg1SystemStream extends InputStream {
 
 		try {
 			position = systemIndex.getPosition(currentStreamID, streamPointer);
-			lastByte =
-				systemIndex.getLastByteInPacket(currentStreamID, streamPointer);
+			lastByte = systemIndex.getLastByteInPacket(currentStreamID,
+					streamPointer);
 			bytesToRead = (int) (lastByte - position) + 1;
 		} catch (StreamNotFoundException snfe) {
 			throw new IOException(snfe.toString());
@@ -209,14 +195,15 @@ public class Mpeg1SystemStream extends InputStream {
 		streamPointer += result;
 		return result;
 	}
-	
-	
+
 	private void seekRafile(long pos) throws IOException {
 		this.buffer.position((int) pos);
 	}
+
 	private int readRafile() throws IOException {
 		return this.buffer.get();
 	}
+
 	private int readRafile(byte[] dst, int off, int len) throws IOException {
 		try {
 			this.buffer.get(dst, off, len);

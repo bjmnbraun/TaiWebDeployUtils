@@ -37,101 +37,90 @@ import javax.sound.sampled.Clip;
  * @author Damien Di Fede
  */
 
-public class AudioSnippet extends Controller implements Playable
-{
-  private Clip c;
+public class AudioSnippet extends Controller implements Playable {
+	private Clip c;
 
-  /**
-   * Constructs an AudioSnippet using the passed Clip.
-   * 
-   * @param clip
-   *          the Clip to wrap
-   */
-  public AudioSnippet(Clip clip)
-  {
-    super(clip);
-    c = clip;
-  }
+	/**
+	 * Constructs an AudioSnippet using the passed Clip.
+	 * 
+	 * @param clip
+	 *          the Clip to wrap
+	 */
+	public AudioSnippet(Clip clip) {
+		super(clip);
+		c = clip;
+	}
 
-  public void play()
-  {
-    c.start();
-  }
+	public void play() {
+		c.start();
+	}
 
-  public void play(int millis)
-  {
-    cue(millis);
-    play();
-  }
+	public void play(int millis) {
+		cue(millis);
+		play();
+	}
 
-  public void pause()
-  {
-    c.stop();
-  }
+	public void pause() {
+		c.stop();
+	}
 
-  public void rewind()
-  {
-    cue(0);
-  }
+	public void rewind() {
+		cue(0);
+	}
 
-  public void loop()
-  {
-    c.loop(Clip.LOOP_CONTINUOUSLY);
-  }
+	public void loop() {
+		c.loop(Clip.LOOP_CONTINUOUSLY);
+	}
 
-  public void loop(int n)
-  {
-    c.loop(n);
-  }
+	public void loop(int n) {
+		c.loop(n);
+	}
 
-  public int length()
-  {
-    return (int) c.getMicrosecondLength() / 1000;
-  }
+	public int length() {
+		return (int) c.getMicrosecondLength() / 1000;
+	}
 
-  public int position()
-  {
-    return (int) (c.getMicrosecondPosition() % c.getMicrosecondLength()) / 1000;
-  }
+	public int position() {
+		return (int) (c.getMicrosecondPosition() % c.getMicrosecondLength()) / 1000;
+	}
 
-  public void cue(int millis)
-  {
-    if ( millis < 0 ) millis = 0;
-    if ( millis > length() ) millis = length();
-    c.setMicrosecondPosition(millis * 1000);
-  }
-  
-  public void skip(int millis)
-  {
-    int pos = position() + millis;
-    if ( pos < 0 ) pos = 0;
-    else if ( pos > length() ) pos = length();
-    c.setMicrosecondPosition(pos * 1000);
-  }
+	public void cue(int millis) {
+		if (millis < 0)
+			millis = 0;
+		if (millis > length())
+			millis = length();
+		c.setMicrosecondPosition(millis * 1000);
+	}
 
-  /**
-   * Returns true even if the clip has been set to play once or if it is on the
-   * last of a series of loops. This is because there is no way to query the
-   * underlying Clip about its loop state.
-   */
-  public boolean isLooping()
-  {
-    return c.isActive();
-  }
+	public void skip(int millis) {
+		int pos = position() + millis;
+		if (pos < 0)
+			pos = 0;
+		else if (pos > length())
+			pos = length();
+		c.setMicrosecondPosition(pos * 1000);
+	}
 
-  public boolean isPlaying()
-  {
-    return c.isActive();
-  }
+	/**
+	 * Returns true even if the clip has been set to play once or if it is on the
+	 * last of a series of loops. This is because there is no way to query the
+	 * underlying Clip about its loop state.
+	 */
+	public boolean isLooping() {
+		return c.isActive();
+	}
 
-  /**
-   * Closes the underlying <code>Clip</code> so that any resources it is using
-   * can be released. This should be called when you are finished using this
-   * snippet.
-   * 
-   */
-  public void close()
-  {
-    c.close();
-  }
+	public boolean isPlaying() {
+		return c.isActive();
+	}
+
+	/**
+	 * Closes the underlying <code>Clip</code> so that any resources it is using
+	 * can be released. This should be called when you are finished using this
+	 * snippet.
+	 * 
+	 */
+	public void close() {
+		c.close();
+	}
 }

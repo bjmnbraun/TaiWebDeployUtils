@@ -25,241 +25,197 @@ import javax.sound.sampled.SourceDataLine;
 
 import org.tritonus.share.sampled.FloatSampleBuffer;
 
-final class MAudioSample extends Thread
-                         implements AudioStream
-{
-  private SignalSplitter splitter;
-  private EffectsChain effects;
-  
-  // sample stuff
-  private AudioFormat format;
-  private FloatSampleBuffer samples;
-  private int[] marks;
-  private int   markAt;
-  
-  // line writing stuff
-  private SourceDataLine line;
-  private FloatSampleBuffer buffer;
-  private boolean finished;
-  
-  MAudioSample(FloatSampleBuffer samps, SourceDataLine sdl, int bufferSize)
-  {
-    super();
-    format = sdl.getFormat();
-    splitter = new SignalSplitter(format, bufferSize);
-    effects = new EffectsChain();
-    
-    marks = new int[20];
-    for (int i = 0; i < marks.length; i++)
-      marks[i] = -1;
-    markAt = 0;
-    samples = samps;
-    
-    line = sdl;
-    buffer = new FloatSampleBuffer(format.getChannels(), 
-                                   bufferSize,
-                                   format.getSampleRate());
-    bytes = new byte[bufferSize*4];
-    finished = false;
-  }
-  
-  public void trigger()
-  {
-    marks[markAt] = 0;
-    markAt++;
-    if ( markAt == marks.length ) markAt = 0;
-  } 
-  
-  private byte[] bytes;
-  public void run()
-  {
-    try
-    {
-      line.open(format, bufferSize() * format.getFrameSize() * 4);
-    }
-    catch (LineUnavailableException e)
-    {
-      Minim.error("Error opening SourceDataLine: " + e.getMessage());
-    }
-    line.start();
-    while ( !finished )
-    {
-      // clear the buffer
-      buffer.makeSilence();
-      // build our signal from all the marks
-      for (int i = 0; i < marks.length; i++)
-      {
-        int begin = marks[i];
-        if (begin == -1) continue;
-        //Minim.debug("Sample trigger in process at marks[" + i + "] = " + marks[i]);
-        int j, k;
-        for (j = begin, k = 0; j < samples.getSampleCount()
-                            && k < buffer.getSampleCount(); j++, k++)
-        {
-          if ( type() == Minim.MONO )
-          {
-            buffer.getChannel(0)[k] += samples.getChannel(0)[j];
-          }
-          else
-          {
-            buffer.getChannel(0)[k] += samples.getChannel(0)[j];           
-            buffer.getChannel(1)[k] += samples.getChannel(1)[j];
-          }
-        }
-        if ( j < samples.getSampleCount() )
-        {
-          marks[i] = j;
-        }
-        else
-        {
-          //Minim.debug("Sample trigger ended.");
-          marks[i] = -1;
-        }
-      }
-      // apply effects and broadcast samples to our listeners
-      if ( type() == Minim.MONO )
-      {
-        if ( effects.hasEnabled() ) 
-        {
-          effects.process(buffer.getChannel(0));
-        }
-        splitter.samples(buffer.getChannel(0));
-      }
-      else
-      {
-        if ( effects.hasEnabled() )
-        {
-          effects.process(buffer.getChannel(0), buffer.getChannel(1));
-        }
-        splitter.samples(buffer.getChannel(0), buffer.getChannel(1));
-      }
-      // write to the line
-      int wrote = buffer.convertToByteArray(bytes,0,format);
-      line.write(bytes, 0, wrote);
-    }
-    line.drain();
-    line.stop();
-    line.close();
-    line = null;
-  }
+final class MAudioSample extends Thread implements AudioStream {
+	private SignalSplitter splitter;
+	private EffectsChain effects;
 
-  public int type()
-  {
-    return format.getChannels();
-  }
-  
-  public void open()
-  {
-    start();
-  }
+	// sample stuff
+	private AudioFormat format;
+	private FloatSampleBuffer samples;
+	private int[] marks;
+	private int markAt;
 
-  public void close()
-  {
-    finished = true;
-  }
+	// line writing stuff
+	private SourceDataLine line;
+	private FloatSampleBuffer buffer;
+	private boolean finished;
 
-  public void addEffect(AudioEffect effect)
-  {
-    effects.add(effect);    
-  }
+	MAudioSample(FloatSampleBuffer samps, SourceDataLine sdl, int bufferSize) {
+		super();
+		format = sdl.getFormat();
+		splitter = new SignalSplitter(format, bufferSize);
+		effects = new EffectsChain();
 
-  public void clearEffects()
-  {
-    effects.clear();    
-  }
+		marks = new int[20];
+		for (int i = 0; i < marks.length; i++)
+			marks[i] = -1;
+		markAt = 0;
+		samples = samps;
 
-  public void disableEffect(int i)
-  {
-    effects.disable(i);
-  }
+		line = sdl;
+		buffer = new FloatSampleBuffer(format.getChannels(), bufferSize, format
+				.getSampleRate());
+		bytes = new byte[bufferSize * 4];
+		finished = false;
+	}
 
-  public void disableEffect(AudioEffect effect)
-  {
-    effects.disable(effect);    
-  }
+	public void trigger() {
+		marks[markAt] = 0;
+		markAt++;
+		if (markAt == marks.length)
+			markAt = 0;
+	}
 
-  public int effectCount()
-  {
-    return effects.size();
-  }
+	private byte[] bytes;
 
-  public void effects()
-  {
-    effects.enableAll();    
-  }
+	public void run() {
+		try {
+			line.open(format, bufferSize() * format.getFrameSize() * 4);
+		} catch (LineUnavailableException e) {
+			Minim.error("Error opening SourceDataLine: " + e.getMessage());
+		}
+		line.start();
+		while (!finished) {
+			// clear the buffer
+			buffer.makeSilence();
+			// build our signal from all the marks
+			for (int i = 0; i < marks.length; i++) {
+				int begin = marks[i];
+				if (begin == -1)
+					continue;
+				//Minim.debug("Sample trigger in process at marks[" + i + "] = " + marks[i]);
+				int j, k;
+				for (j = begin, k = 0; j < samples.getSampleCount()
+						&& k < buffer.getSampleCount(); j++, k++) {
+					if (type() == Minim.MONO) {
+						buffer.getChannel(0)[k] += samples.getChannel(0)[j];
+					} else {
+						buffer.getChannel(0)[k] += samples.getChannel(0)[j];
+						buffer.getChannel(1)[k] += samples.getChannel(1)[j];
+					}
+				}
+				if (j < samples.getSampleCount()) {
+					marks[i] = j;
+				} else {
+					//Minim.debug("Sample trigger ended.");
+					marks[i] = -1;
+				}
+			}
+			// apply effects and broadcast samples to our listeners
+			if (type() == Minim.MONO) {
+				if (effects.hasEnabled()) {
+					effects.process(buffer.getChannel(0));
+				}
+				splitter.samples(buffer.getChannel(0));
+			} else {
+				if (effects.hasEnabled()) {
+					effects.process(buffer.getChannel(0), buffer.getChannel(1));
+				}
+				splitter.samples(buffer.getChannel(0), buffer.getChannel(1));
+			}
+			// write to the line
+			int wrote = buffer.convertToByteArray(bytes, 0, format);
+			line.write(bytes, 0, wrote);
+		}
+		line.drain();
+		line.stop();
+		line.close();
+		line = null;
+	}
 
-  public void enableEffect(int i)
-  {
-    effects.enable(i); 
-  }
+	public int type() {
+		return format.getChannels();
+	}
 
-  public void enableEffect(AudioEffect effect)
-  {
-    effects.enable(effect);
-  }
+	public void open() {
+		start();
+	}
 
-  public AudioEffect getEffect(int i)
-  {
-    return effects.get(i);
-  }
+	public void close() {
+		finished = true;
+	}
 
-  public boolean isEffected()
-  {
-    return effects.hasEnabled();
-  }
+	public void addEffect(AudioEffect effect) {
+		effects.add(effect);
+	}
 
-  public boolean isEnabled(AudioEffect effect)
-  {
-    return effects.isEnabled(effect);
-  }
+	public void clearEffects() {
+		effects.clear();
+	}
 
-  public void noEffects()
-  {
-    effects.disableAll();
-  }
+	public void disableEffect(int i) {
+		effects.disable(i);
+	}
 
-  public void removeEffect(AudioEffect effect)
-  {
-    effects.remove(effect);   
-  }
+	public void disableEffect(AudioEffect effect) {
+		effects.disable(effect);
+	}
 
-  public AudioEffect removeEffect(int i)
-  {
-    return effects.remove(i);
-  }
+	public int effectCount() {
+		return effects.size();
+	}
 
-  public void addListener(AudioListener listener)
-  {
-    splitter.addListener(listener);    
-  }
+	public void effects() {
+		effects.enableAll();
+	}
 
-  public int bufferSize()
-  {
-    return splitter.bufferSize();
-  }
+	public void enableEffect(int i) {
+		effects.enable(i);
+	}
 
-  public AudioFormat getFormat()
-  {
-    return format;
-  }
+	public void enableEffect(AudioEffect effect) {
+		effects.enable(effect);
+	}
 
-  public void removeListener(AudioListener listener)
-  {
-    splitter.removeListener(listener);
-  }
+	public AudioEffect getEffect(int i) {
+		return effects.get(i);
+	}
 
-  public DataLine getDataLine()
-  {
-    return line;
-  }
-  
-  public float sampleRate()
-  {
-    return splitter.sampleRate();
-  }
+	public boolean isEffected() {
+		return effects.hasEnabled();
+	}
 
-  public boolean hasEffect(AudioEffect effect)
-  {
-    return effects.contains(effect);
-  }
+	public boolean isEnabled(AudioEffect effect) {
+		return effects.isEnabled(effect);
+	}
+
+	public void noEffects() {
+		effects.disableAll();
+	}
+
+	public void removeEffect(AudioEffect effect) {
+		effects.remove(effect);
+	}
+
+	public AudioEffect removeEffect(int i) {
+		return effects.remove(i);
+	}
+
+	public void addListener(AudioListener listener) {
+		splitter.addListener(listener);
+	}
+
+	public int bufferSize() {
+		return splitter.bufferSize();
+	}
+
+	public AudioFormat getFormat() {
+		return format;
+	}
+
+	public void removeListener(AudioListener listener) {
+		splitter.removeListener(listener);
+	}
+
+	public DataLine getDataLine() {
+		return line;
+	}
+
+	public float sampleRate() {
+		return splitter.sampleRate();
+	}
+
+	public boolean hasEffect(AudioEffect effect) {
+		return effects.contains(effect);
+	}
 }

@@ -25,25 +25,22 @@ package ddf.minim.effects;
  * @author Damien Di Fede
  *
  */
-public class HighPassSP extends IIRFilter 
-{
-  /**
-   * Constructs a high pass filter with a cutoff frequency of <code>freq</code> that will be 
-   * used to filter audio recorded at <code>sampleRate</code>.
-   * 
-   * @param freq the cutoff frequency
-   * @param sampleRate the sample rate of audio that will be filtered
-   */
-	public HighPassSP(float freq, float sampleRate) 
-	{
-	  super(freq, sampleRate);
+public class HighPassSP extends IIRFilter {
+	/**
+	 * Constructs a high pass filter with a cutoff frequency of <code>freq</code> that will be 
+	 * used to filter audio recorded at <code>sampleRate</code>.
+	 * 
+	 * @param freq the cutoff frequency
+	 * @param sampleRate the sample rate of audio that will be filtered
+	 */
+	public HighPassSP(float freq, float sampleRate) {
+		super(freq, sampleRate);
 	}
 
-	protected void calcCoeff() 
-	{
-    float fracFreq = frequency()/sampleRate();
-	  float x = (float)Math.exp(-2 * Math.PI * fracFreq);
-	  a = new float[] { (1+x)/2, -(1+x)/2 };
-	  b = new float[] { x };
+	protected void calcCoeff() {
+		float fracFreq = frequency() / sampleRate();
+		float x = (float) Math.exp(-2 * Math.PI * fracFreq);
+		a = new float[] { (1 + x) / 2, -(1 + x) / 2 };
+		b = new float[] { x };
 	}
 }

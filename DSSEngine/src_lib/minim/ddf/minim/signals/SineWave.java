@@ -25,27 +25,24 @@ package ddf.minim.signals;
  * @see <a href="http://en.wikipedia.org/wiki/Sine_wave">Sine Wave</a>
  *
  */
-public class SineWave extends Oscillator 
-{
+public class SineWave extends Oscillator {
 
-  /**
-   * Constructs a sine wave with the given frequency, amplitude and sample
-   * rate.
-   * 
-   * @param frequency
-   *          the frequency of the pulse wave
-   * @param amplitude
-   *          the amplitude of the pulse wave
-   * @param sampleRate
-   *          the sample rate of the pulse wave
-   */
-	public SineWave(float frequency, float amplitude, float sampleRate) 
-	{
-	  super(frequency, amplitude, sampleRate);
+	/**
+	 * Constructs a sine wave with the given frequency, amplitude and sample
+	 * rate.
+	 * 
+	 * @param frequency
+	 *          the frequency of the pulse wave
+	 * @param amplitude
+	 *          the amplitude of the pulse wave
+	 * @param sampleRate
+	 *          the sample rate of the pulse wave
+	 */
+	public SineWave(float frequency, float amplitude, float sampleRate) {
+		super(frequency, amplitude, sampleRate);
 	}
 
-	protected float value(float step) 
-	{
-	  return (float)Math.sin(frequency()*TWO_PI*step);
+	protected float value(float step) {
+		return (float) Math.sin(frequency() * TWO_PI * step);
 	}
 }

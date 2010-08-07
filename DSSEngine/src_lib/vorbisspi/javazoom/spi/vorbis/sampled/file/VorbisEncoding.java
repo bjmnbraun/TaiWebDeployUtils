@@ -27,15 +27,14 @@ import javax.sound.sampled.AudioFormat;
 /**
  * Encodings used by the VORBIS audio decoder.
  */
-public class VorbisEncoding extends AudioFormat.Encoding
-{
-  public static final AudioFormat.Encoding VORBISENC = new VorbisEncoding("VORBISENC");
+public class VorbisEncoding extends AudioFormat.Encoding {
+	public static final AudioFormat.Encoding VORBISENC = new VorbisEncoding(
+			"VORBISENC");
 
-  /**
-   * Constructors.
-   */
-  public VorbisEncoding(String name)
-  {
-    super(name);
-  }
+	/**
+	 * Constructors.
+	 */
+	public VorbisEncoding(String name) {
+		super(name);
+	}
 }

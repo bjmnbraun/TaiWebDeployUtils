@@ -34,6 +34,5 @@ package edu.umd.cfar.lamp.mpeg1.system;
  *   <br>
  *    - ISO/IEC 11172-1 Section 2.4.4.3
  */
-public class DecodingTimeStamp extends BaseTimeStamp
-{
+public class DecodingTimeStamp extends BaseTimeStamp {
 }

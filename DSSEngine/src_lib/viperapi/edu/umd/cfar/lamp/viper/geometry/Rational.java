@@ -24,7 +24,7 @@ public class Rational extends Number implements Comparable {
 	 * 1
 	 */
 	private static final long serialVersionUID = 1L;
-	
+
 	/**
 	 * This array holds the numerator and denominator
 	 */
@@ -37,7 +37,7 @@ public class Rational extends Number implements Comparable {
 	private Rational reduce() {
 		// handle cases with zeroes
 		if ((bignum[0].equals(BigInteger.ZERO))
-			|| (bignum[1].equals(BigInteger.ZERO))) {
+				|| (bignum[1].equals(BigInteger.ZERO))) {
 			int compVal = bignum[0].compareTo(BigInteger.ZERO);
 			if (!bignum[1].equals(BigInteger.ZERO)) {
 				bignum[1] = BigInteger.ONE;
@@ -157,14 +157,14 @@ public class Rational extends Number implements Comparable {
 			return bignum[0].toString();
 		} else if (bignum[1].equals(BigInteger.ZERO)) {
 			switch (bignum[0].compareTo(BigInteger.ZERO)) {
-				case -1 :
-					return "-inf";
-				case 0 :
-					return "NaN";
-				case 1 :
-					return "+inf";
-				default :
-					return "badValue";
+			case -1:
+				return "-inf";
+			case 0:
+				return "NaN";
+			case 1:
+				return "+inf";
+			default:
+				return "badValue";
 			}
 		} else
 			return ("(" + bignum[0] + " / " + bignum[1] + ")");
@@ -192,10 +192,9 @@ public class Rational extends Number implements Comparable {
 		}
 		if (other instanceof Rational) {
 			Rational rother = (Rational) other;
-			return (
-				bignum[0].equals(rother.bignum[0])
-					&& bignum[1].equals(rother.bignum[1]));
-		} 
+			return (bignum[0].equals(rother.bignum[0]) && bignum[1]
+					.equals(rother.bignum[1]));
+		}
 		if (other instanceof Number) {
 			return ((Number) other).doubleValue() == doubleValue();
 		}
@@ -222,7 +221,7 @@ public class Rational extends Number implements Comparable {
 	 */
 	public boolean isZero() {
 		return bignum[0].equals(BigInteger.ZERO)
-			&& !bignum[1].equals(BigInteger.ZERO);
+				&& !bignum[1].equals(BigInteger.ZERO);
 	}
 
 	/**
@@ -249,14 +248,13 @@ public class Rational extends Number implements Comparable {
 	public boolean lessThan(Rational other) {
 		BigInteger[] otherNum = other.bignum;
 		BigInteger[] thisNum = bignum;
-		if ((thisNum[0].equals(BigInteger.ZERO)
-			&& thisNum[1].equals(BigInteger.ZERO))
-			|| (otherNum[0].equals(BigInteger.ZERO)
-				&& otherNum[1].equals(BigInteger.ZERO))) {
-			throw new ArithmeticException("0/0 error: " + this +" < " + other);
+		if ((thisNum[0].equals(BigInteger.ZERO) && thisNum[1]
+				.equals(BigInteger.ZERO))
+				|| (otherNum[0].equals(BigInteger.ZERO) && otherNum[1]
+						.equals(BigInteger.ZERO))) {
+			throw new ArithmeticException("0/0 error: " + this + " < " + other);
 
-		} else if (
-			thisNum[1].equals(BigInteger.ZERO)
+		} else if (thisNum[1].equals(BigInteger.ZERO)
 				&& otherNum[1].equals(BigInteger.ZERO)) {
 			return (thisNum[0].compareTo(otherNum[0]) < 0);
 
@@ -275,10 +273,8 @@ public class Rational extends Number implements Comparable {
 			if (otherNum[1].signum() < 0) {
 				other.reduce();
 			}
-			return (
-				thisNum[0].multiply(otherNum[1]).compareTo(
-					otherNum[0].multiply(thisNum[1]))
-					< 0);
+			return (thisNum[0].multiply(otherNum[1]).compareTo(
+					otherNum[0].multiply(thisNum[1])) < 0);
 		}
 	}
 
@@ -356,10 +352,8 @@ public class Rational extends Number implements Comparable {
 	public double doubleValue() {
 		BigInteger[] quotAndRem = bignum[0].divideAndRemainder(bignum[1]);
 		double retval = quotAndRem[0].doubleValue();
-		quotAndRem[1] =
-			quotAndRem[1].multiply(
-				BigInteger.valueOf(Integer.MAX_VALUE)).divide(
-				bignum[1]);
+		quotAndRem[1] = quotAndRem[1].multiply(
+				BigInteger.valueOf(Integer.MAX_VALUE)).divide(bignum[1]);
 		retval += quotAndRem[1].doubleValue() / Integer.MAX_VALUE;
 		return retval;
 	}
@@ -404,7 +398,7 @@ public class Rational extends Number implements Comparable {
 	public BigInteger floor() {
 		return bignum[0].divide(bignum[1]);
 	}
-	
+
 	/**
 	 * Compute the ceiling as an integer.
 	 * @return the ceiling
@@ -459,10 +453,8 @@ public class Rational extends Number implements Comparable {
 	 * @param second a Rational to subtract from the first.
 	 * @param difference where to store the result.
 	 */
-	public static void minus(
-		Rational first,
-		Rational second,
-		Rational difference) {
+	public static void minus(Rational first, Rational second,
+			Rational difference) {
 		Rational.plus(first, new Rational(second).negate(), difference);
 	}
 
@@ -478,10 +470,7 @@ public class Rational extends Number implements Comparable {
 	 * @param result
 	 *            Where to store the result.
 	 */
-	public static void multiply(
-		Rational first,
-		Rational second,
-		Rational result) {
+	public static void multiply(Rational first, Rational second, Rational result) {
 		BigInteger[] A;
 		BigInteger[] B;
 		A = first.bignum;
@@ -521,10 +510,8 @@ public class Rational extends Number implements Comparable {
 	 * @param quotient
 	 *            Where to store the answer.
 	 */
-	public static void divide(
-		Rational numerator,
-		Rational denominator,
-		Rational quotient) {
+	public static void divide(Rational numerator, Rational denominator,
+			Rational quotient) {
 		BigInteger[] A;
 		BigInteger[] B;
 		A = numerator.bignum;
@@ -620,9 +607,10 @@ public class Rational extends Number implements Comparable {
 			BigInteger num = new BigInteger(fracPart);
 			r.bignum[0] = num;
 			r.bignum[1] = denom;
-		} else if (!"".equals(fracPart)){
+		} else if (!"".equals(fracPart)) {
 			r.bignum[0] = new BigInteger(fracPart);
-			r.bignum[1] = st.hasMoreTokens() ? new BigInteger(st.nextToken()) : BigInteger.ONE;
+			r.bignum[1] = st.hasMoreTokens() ? new BigInteger(st.nextToken())
+					: BigInteger.ONE;
 		} else {
 			r.bignum[0] = BigInteger.ZERO;
 			r.bignum[1] = BigInteger.ONE;

@@ -16,7 +16,6 @@ import java.io.*;
 
 import edu.columbia.ee.flavor.*;
 
-public interface Parsable
-{
+public interface Parsable {
 	public void parse(Bitstream bitstream) throws IOException;
 }

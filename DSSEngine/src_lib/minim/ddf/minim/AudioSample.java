@@ -35,33 +35,30 @@ package ddf.minim;
  * @author Damien Di Fede
  * 
  */
-public class AudioSample extends AudioSource
-{
-  // the class that does the real work
-  private MAudioSample sample;
+public class AudioSample extends AudioSource {
+	// the class that does the real work
+	private MAudioSample sample;
 
-  /**
-   * Constructs an <code>AudioSample</code> that sends samples to
-   * <code>line</code> using <code>samp</code>.
-   * 
-   * @param line
-   *          the <code>Line</code> to control
-   * @param samp
-   *          the <code>MAudioSample</code> to trigger
-   */
-  AudioSample(MAudioSample samp)
-  {
-    super(samp);
-    sample = samp;
-  }
+	/**
+	 * Constructs an <code>AudioSample</code> that sends samples to
+	 * <code>line</code> using <code>samp</code>.
+	 * 
+	 * @param line
+	 *          the <code>Line</code> to control
+	 * @param samp
+	 *          the <code>MAudioSample</code> to trigger
+	 */
+	AudioSample(MAudioSample samp) {
+		super(samp);
+		sample = samp;
+	}
 
-  /**
-   * Triggers the sample. This may be called while the sound is still playing
-   * back.
-   * 
-   */
-  public void trigger()
-  {
-    sample.trigger();
-  }
+	/**
+	 * Triggers the sample. This may be called while the sound is still playing
+	 * back.
+	 * 
+	 */
+	public void trigger() {
+		sample.trigger();
+	}
 }

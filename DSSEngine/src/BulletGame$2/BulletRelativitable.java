@@ -2,7 +2,8 @@ package BulletGame$2;
 
 import TaiGameCore.GameDataBase;
 
-public abstract class BulletRelativitable extends BulletExpressionGameDB implements GameDataBase.StringBase, GraphicsHolder {
+public abstract class BulletRelativitable extends BulletExpressionGameDB
+		implements GameDataBase.StringBase, GraphicsHolder {
 	public BulletRelativitable(String hash) {
 		super(hash);
 	}
@@ -15,10 +16,7 @@ public abstract class BulletRelativitable extends BulletExpressionGameDB impleme
 	public static final int SOURCELOCK = 5;
 	public static final int PLAYER = 6;
 	public static final int CENTER_SPOT = 7;
-	
 
-	
-	
 	public static interface PositionRelativitator {
 		/**<pre>
 		 * Bullet sources are "shoved" by the camera / viewport.
@@ -47,9 +45,9 @@ public abstract class BulletRelativitable extends BulletExpressionGameDB impleme
 		 * Note: source is a coordinate in "raw" coordinates. (so, 0,0 is really the top left of the screen.)
 		 *</pre>
 		 */
-		void relativity(float[] position, float sourcex, float sourcey, BulletRelativitable br);
+		void relativity(float[] position, float sourcex, float sourcey,
+				BulletRelativitable br);
 	}
-
 
 	public abstract int getRelativeMode();
 

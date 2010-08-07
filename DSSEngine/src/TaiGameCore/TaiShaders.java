@@ -2,7 +2,6 @@ package TaiGameCore;
 
 import javax.media.opengl.GL2;
 
-
 public class TaiShaders {
 
 	/**
@@ -31,21 +30,22 @@ public class TaiShaders {
 		shaders = new int[1];
 		gl.glGenProgramsARB(1, shaders, 0);
 		gl.glBindProgramARB(gl.GL_VERTEX_PROGRAM_ARB, shaders[0]);
-		gl.glProgramStringARB(gl.GL_VERTEX_PROGRAM_ARB, 
+		gl.glProgramStringARB(gl.GL_VERTEX_PROGRAM_ARB,
 				gl.GL_PROGRAM_FORMAT_ASCII_ARB, vertTxt.length(), vertTxt);
 
-		String programErrorString = gl.glGetString(gl.GL_PROGRAM_ERROR_STRING_ARB);
+		String programErrorString = gl
+				.glGetString(gl.GL_PROGRAM_ERROR_STRING_ARB);
 
 		int errorPos[] = new int[1];
 
-		gl.glGetIntegerv(gl.GL_PROGRAM_ERROR_POSITION_ARB, errorPos,0);
-		if(errorPos[0]!=-1)
+		gl.glGetIntegerv(gl.GL_PROGRAM_ERROR_POSITION_ARB, errorPos, 0);
+		if (errorPos[0] != -1)
 			System.err.println("VP Error:" + programErrorString);
 
 		gl.glDisable(gl.GL_VERTEX_PROGRAM_ARB);
 	}
 
 	public void cleanup() {
-		gl.glDeleteProgramsARB(1,shaders,0);
+		gl.glDeleteProgramsARB(1, shaders, 0);
 	}
 }

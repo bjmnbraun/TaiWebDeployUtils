@@ -7,19 +7,20 @@ import BulletGame$1.BulletGame$1Engine$L4$1$BulletGameBulletSimulation.GameScree
 
 public class TaiBenchmark {
 
-	
-	public void mark(){
+	public void mark() {
 	}
-	public void markDone(){
+
+	public void markDone() {
 	}
-	public static void bench(BulletGameGamePlay bggp){
+
+	public static void bench(BulletGameGamePlay bggp) {
 	}
-	public static void bench(EditorScreen bggp){
+
+	public static void bench(EditorScreen bggp) {
 	}
-	 
-	
+
 	private static int firstBench = 0;
-	
+
 	/*
 	public static void bench(EditorScreen obj){
 		if (firstBench==0){ firstBench=1; return; }
@@ -107,34 +108,38 @@ public class TaiBenchmark {
 	}
 	*/
 
-	public static void main(String[] args) throws ClassNotFoundException{
+	public static void main(String[] args) throws ClassNotFoundException {
 		Class test;
 		test = BulletGame$1.BulletGame$1Engine$L4$1$BulletGameBulletSimulation.GameScreen.BulletGameGamePlay.class;
 		test = BulletGame$1.BulletGame$1Engine$L3$1$BulletGameEditorScreen.EditorScreen.class;
 		Class q = test;
-		
-		
+
 		System.out.println("if (firstBench==0){ firstBench=1; return; }");
 		System.out.println("if (firstBench==1){firstBench=2;");
-		for(Field k : q.getFields()){
-			if (k.getType().equals(TaiBenchmark.class)){
-				System.out.println("for (int p = 0; p < obj."+k.getName()+".maxStackDepth; p++){");
-				for(int i = 0; i < 2; i++){
-					System.out.println("System.out.print(\""+k.getName()+"_\"+p+\" \");");
+		for (Field k : q.getFields()) {
+			if (k.getType().equals(TaiBenchmark.class)) {
+				System.out.println("for (int p = 0; p < obj." + k.getName()
+						+ ".maxStackDepth; p++){");
+				for (int i = 0; i < 2; i++) {
+					System.out.println("System.out.print(\"" + k.getName()
+							+ "_\"+p+\" \");");
 				}
 				System.out.println("}");
 			}
 		}
 		System.out.println("System.out.println();");
 		System.out.println("}");
-		for(Field k : q.getFields()){
-			if (k.getType().equals(TaiBenchmark.class)){
-				System.out.println("for (int p = 0; p < obj."+k.getName()+".maxStackDepth; p++){");
-				System.out.println("System.out.print(obj."+k.getName()+".ops[p]+\" \");");
-				System.out.println("System.out.print(obj."+k.getName()+".avgNanos[p]+\" \");");
+		for (Field k : q.getFields()) {
+			if (k.getType().equals(TaiBenchmark.class)) {
+				System.out.println("for (int p = 0; p < obj." + k.getName()
+						+ ".maxStackDepth; p++){");
+				System.out.println("System.out.print(obj." + k.getName()
+						+ ".ops[p]+\" \");");
+				System.out.println("System.out.print(obj." + k.getName()
+						+ ".avgNanos[p]+\" \");");
 				//Reset the stuff:
 				System.out.println("}");
-				System.out.println("obj."+k.getName()+".reset();");
+				System.out.println("obj." + k.getName() + ".reset();");
 			}
 		}
 		System.out.println("System.out.println();");

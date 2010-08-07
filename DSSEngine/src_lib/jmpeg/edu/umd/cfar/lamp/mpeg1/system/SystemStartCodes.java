@@ -12,13 +12,12 @@
 
 package edu.umd.cfar.lamp.mpeg1.system;
 
-public abstract class SystemStartCodes
-{
+public abstract class SystemStartCodes {
 	/** Terminates a System stream.  32 bits.  (ISO/IEC 11172-1 Section 2.4.4.1) */
-	public static final int ISO_11172_END_CODE       = 0x000001B9;
+	public static final int ISO_11172_END_CODE = 0x000001B9;
 
 	/** Begins a Pack.  32 bits.  (ISO/IEC 11172-1 Section 2.4.4.2) */
-	public static final int PACK_START_CODE          = 0x000001BA;
+	public static final int PACK_START_CODE = 0x000001BA;
 
 	/** Begins a System Header.  32 bits.  (ISO/IEC 11172-1 Section 2.4.4.2) */
 	public static final int SYSTEM_HEADER_START_CODE = 0x000001BB;

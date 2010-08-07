@@ -29,23 +29,25 @@ public interface TaiScriptLanguage$Constants {
 	@Target(ElementType.FIELD)
 	public @interface AliasRefersTo {
 		public Class<? extends GameDataBase.StringBase> GameDatabaseClass();
+
 		public int displayOrder();
 	}
-	@AliasRefersTo(GameDatabaseClass=BulletPattern.class, displayOrder = 7)
+
+	@AliasRefersTo(GameDatabaseClass = BulletPattern.class, displayOrder = 7)
 	public static String BULLET = "bullet";
-	@AliasRefersTo(GameDatabaseClass=BulletBoss.class, displayOrder = 3)
+	@AliasRefersTo(GameDatabaseClass = BulletBoss.class, displayOrder = 3)
 	public static String BOSS = "boss";
 	public static String TEMPLATE = "template_type";
-	@AliasRefersTo(GameDatabaseClass=BulletLevel.class, displayOrder = 1)
+	@AliasRefersTo(GameDatabaseClass = BulletLevel.class, displayOrder = 1)
 	public static String LEVEL = "level";
-	@AliasRefersTo(GameDatabaseClass=BulletSpellCard.class, displayOrder = 5)
+	@AliasRefersTo(GameDatabaseClass = BulletSpellCard.class, displayOrder = 5)
 	public static String SPELLCARD = "spellcard";
-	@AliasRefersTo(GameDatabaseClass=BulletAccessory.class, displayOrder = 4)
+	@AliasRefersTo(GameDatabaseClass = BulletAccessory.class, displayOrder = 4)
 	public static String ACCESSORY = "accessory";
-	@AliasRefersTo(GameDatabaseClass=BulletPlayer.class, displayOrder = 2)
+	@AliasRefersTo(GameDatabaseClass = BulletPlayer.class, displayOrder = 2)
 	public static String PLAYER = "player";
-	@AliasRefersTo(GameDatabaseClass=BulletGlobals.class, displayOrder = 0)
+	@AliasRefersTo(GameDatabaseClass = BulletGlobals.class, displayOrder = 0)
 	public static String GLOBAL = "globals";
-	@AliasRefersTo(GameDatabaseClass=BulletBackground.class, displayOrder = 6)
+	@AliasRefersTo(GameDatabaseClass = BulletBackground.class, displayOrder = 6)
 	public static String BACKGROUND = "background";
 }

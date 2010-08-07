@@ -14,10 +14,12 @@ import TaiGameCore.TaiTrees.StringTreeIterator;
 import com.iabcinc.jmep.Environment;
 import com.iabcinc.jmep.XExpression;
 
-public class BulletSpellCard extends BulletExpressionGameDB implements GameDataBase.StringBase{
+public class BulletSpellCard extends BulletExpressionGameDB implements
+		GameDataBase.StringBase {
 	public BulletSpellCard(String hash) {
 		super(hash);
 	}
+
 	@FromScript()
 	@CriticalScriptField()
 	public String name;
@@ -75,7 +77,7 @@ public class BulletSpellCard extends BulletExpressionGameDB implements GameDataB
 	public String duration;
 	private float duration_f;
 	private boolean duration_b;
-	
+
 	/**
 	 * Size of the Boss's healthbar.
 	 */
@@ -84,7 +86,7 @@ public class BulletSpellCard extends BulletExpressionGameDB implements GameDataB
 	@DefaultValue(value = "1")
 	public float health;
 	public float health0;
-	
+
 	/**
 	 * Backgrounds which are nested in a SpellCard are automatically rendered as
 	 * part of this spellcard. However, if you would like to use the backgrounds
@@ -109,170 +111,214 @@ public class BulletSpellCard extends BulletExpressionGameDB implements GameDataB
 	 * What the compiler predicts for the card.
 	 */
 	public float predicted_start_time;
-	
-	public void doDamageAgainst(BulletPattern bp){
+
+	public void doDamageAgainst(BulletPattern bp) {
 		health--;
 	}
-	public float getHealthDuration(float bulletMethodBegins, BulletHellInstancePlayer bhip) {
-		if (bhip.currentPart.myBoss>=0){
+
+	public float getHealthDuration(float bulletMethodBegins,
+			BulletHellInstancePlayer bhip) {
+		if (bhip.currentPart.myBoss >= 0) {
 			return -1; //No matter what, the health bar shouldn't be here without a boss
 		}
-		if (duration_f <= -1){ //these are based on damage
-			return health/health0;
+		if (duration_f <= -1) { //these are based on damage
+			return health / health0;
 		}
-		if (-1 < duration_f && duration_f <= 0){
+		if (-1 < duration_f && duration_f <= 0) {
 			return -1; //Infinite, no health bar
 		}
 		//Otherwise, interpret duration_f as a raw amount of time
 		return -1; //No health bar
 	}
-	public boolean isFinished(float bulletMethodBegins, BulletHellInstancePlayer bhip){
-		if (-1 < duration_f && duration_f <= 0){
+
+	public boolean isFinished(float bulletMethodBegins,
+			BulletHellInstancePlayer bhip) {
+		if (-1 < duration_f && duration_f <= 0) {
 			return false;
-		}		
-		if (duration_f <= -1){
-			if (bhip.currentPart.myBoss>=0){
+		}
+		if (duration_f <= -1) {
+			if (bhip.currentPart.myBoss >= 0) {
 				return health < 0;
 			} else {
 				//NO boss, so... don't die?
 				return false;
 			}
 		}
-		float durationTimeRatio = getDurationTimeRatio(bulletMethodBegins,bhip);
-		return durationTimeRatio<0;
+		float durationTimeRatio = getDurationTimeRatio(bulletMethodBegins, bhip);
+		return durationTimeRatio < 0;
 	}
+
 	/**
 	 * Only works if duration is in the "time" area.
 	 * 0 = time up
 	 * 1 = full time
 	 */
-	private float getDurationTimeRatio(float bulletMethodBegins, BulletHellInstancePlayer bhip){
-		if (duration_b){
+	private float getDurationTimeRatio(float bulletMethodBegins,
+			BulletHellInstancePlayer bhip) {
+		if (duration_b) {
 			float timeb = bhip.getBeatFromSongTime(bulletMethodBegins);
-			if (timeb < 0){
+			if (timeb < 0) {
 				return 0; //Not allowed.
 			}
-			timeb -= Math.max(bhip.getBeatFromSongTime(start_time),0);
+			timeb -= Math.max(bhip.getBeatFromSongTime(start_time), 0);
 			return 1 - timeb / duration_f;
 		}
 		float time = bulletMethodBegins - start_time;
 		return 1 - time / duration_f;
 	}
+
 	/**
 	 * Actively predict the duration of this card. Used in the editor.
 	 * Return -1 if a prediction is impossible. This will breakdown the prediction
 	 * chain.
 	 */
-	public float predictDuration(float startTime, BulletHellInstancePlayer bhip){
-		if (-1 < duration_f && duration_f <= 0){
+	public float predictDuration(float startTime, BulletHellInstancePlayer bhip) {
+		if (-1 < duration_f && duration_f <= 0) {
 			return -1; //Infinity?
-		}		
-		if (duration_f <= -1){
+		}
+		if (duration_f <= -1) {
 			return -1; //Can't predict how long it will take to kill boss.
 		}
-		if (duration_b){
-			return bhip.getTimeFromBeat(bhip.getBeatFromSongTime(startTime)+duration_f)-startTime;
+		if (duration_b) {
+			return bhip.getTimeFromBeat(bhip.getBeatFromSongTime(startTime)
+					+ duration_f)
+					- startTime;
 		}
 		return duration_f;
 	}
 
-	public MultiExpression[] createExpression(Environment env, BulletGlobals defines) throws XExpression {
-		duration = duration.replaceAll("\\s+","");
-		if (duration.length()>0){
-			duration_b = duration.charAt(duration.length()-1)=='b';
-			duration_f = duration_b?new Float(duration.substring(0,duration.length()-1)):new Float(duration);
+	public MultiExpression[] createExpression(Environment env,
+			BulletGlobals defines) throws XExpression {
+		duration = duration.replaceAll("\\s+", "");
+		if (duration.length() > 0) {
+			duration_b = duration.charAt(duration.length() - 1) == 'b';
+			duration_f = duration_b ? new Float(duration.substring(0, duration
+					.length() - 1)) : new Float(duration);
 		} else {
 			throw new RuntimeException("No duration");
 		}
 		health = -duration_f;
 		health0 = health;
 
-		return new MultiExpression[]{
-				(level_w.trim().equals("")?null:expr(level_w,env,defines)),
-				(level_h.trim().equals("")?null:expr(level_h,env,defines)),
-				(level_xo.trim().equals("")?null:expr(level_xo,env,defines)),
-				(level_yo.trim().equals("")?null:expr(level_yo,env,defines)),
-				expr(orientation,env,defines),
-		};
+		return new MultiExpression[] {
+				(level_w.trim().equals("") ? null : expr(level_w, env, defines)),
+				(level_h.trim().equals("") ? null : expr(level_h, env, defines)),
+				(level_xo.trim().equals("") ? null : expr(level_xo, env,
+						defines)),
+				(level_yo.trim().equals("") ? null : expr(level_yo, env,
+						defines)), expr(orientation, env, defines), };
 	}
-//AUTOWRITTEN
-	public ArrayList<Exception> parseFromStrings(TaiDAWG<String> data, Validator ... valid) {
+
+	//AUTOWRITTEN
+	public ArrayList<Exception> parseFromStrings(TaiDAWG<String> data,
+			Validator... valid) {
 		ArrayList<Exception> toRet = new ArrayList();
 		WordByRef<String> word;
 		word = data.get("name");
-		if (word!=null){String val = word.getContentData();
-		name= val;
-		}
-		 else {
+		if (word != null) {
+			String val = word.getContentData();
+			name = val;
+		} else {
 			toRet.add(new FieldRequiredException("name required."));
 		}
 		word = data.get("level_w");
-		if (word!=null){String val = word.getContentData();
-		level_w= val;
+		if (word != null) {
+			String val = word.getContentData();
+			level_w = val;
 		}
 		word = data.get("level_h");
-		if (word!=null){String val = word.getContentData();
-		level_h= val;
+		if (word != null) {
+			String val = word.getContentData();
+			level_h = val;
 		}
 		word = data.get("level_xo");
-		if (word!=null){String val = word.getContentData();
-		level_xo= val;
+		if (word != null) {
+			String val = word.getContentData();
+			level_xo = val;
 		}
 		word = data.get("level_yo");
-		if (word!=null){String val = word.getContentData();
-		level_yo= val;
+		if (word != null) {
+			String val = word.getContentData();
+			level_yo = val;
 		}
 		word = data.get("orientation");
-		if (word!=null){String val = word.getContentData();
-	try {
-		valid[0].validate("orientation",val);
-	} catch (ValidationException e){
-	toRet.add(e);}
-		orientation= val;
+		if (word != null) {
+			String val = word.getContentData();
+			try {
+				valid[0].validate("orientation", val);
+			} catch (ValidationException e) {
+				toRet.add(e);
+			}
+			orientation = val;
 		}
 		word = data.get("duration");
-		if (word!=null){String val = word.getContentData();
-		duration= val;
+		if (word != null) {
+			String val = word.getContentData();
+			duration = val;
 		}
 		word = data.get("health");
-		if (word!=null){String val = word.getContentData();
-	try {
-		valid[5].validate("health",val);
-	} catch (ValidationException e){
-	toRet.add(e);}
-		health= new Float(val.trim());
+		if (word != null) {
+			String val = word.getContentData();
+			try {
+				valid[5].validate("health", val);
+			} catch (ValidationException e) {
+				toRet.add(e);
+			}
+			health = new Float(val.trim());
 		}
 		word = data.get("addBgs");
-		if (word!=null){String val = word.getContentData();
-		addBgs= val;
+		if (word != null) {
+			String val = word.getContentData();
+			addBgs = val;
 		}
-	StringTreeIterator<WordByRef<String>> iterator = data.iterator();
-	while(iterator.hasNext()){
-		String key = iterator.next();
-	if (!key.equals("name")&&!key.equals("level_w")&&!key.equals("level_h")&&!key.equals("level_xo")&&!key.equals("level_yo")&&!key.equals("orientation")&&!key.equals("duration")&&!key.equals("health")&&!key.equals("addBgs")){
-			toRet.add(new ValidationException("Unrecognized var: "+key+".",key));
-	}
-		iterator.tryNext();
-	}
+		StringTreeIterator<WordByRef<String>> iterator = data.iterator();
+		while (iterator.hasNext()) {
+			String key = iterator.next();
+			if (!key.equals("name") && !key.equals("level_w")
+					&& !key.equals("level_h") && !key.equals("level_xo")
+					&& !key.equals("level_yo") && !key.equals("orientation")
+					&& !key.equals("duration") && !key.equals("health")
+					&& !key.equals("addBgs")) {
+				toRet.add(new ValidationException("Unrecognized var: " + key
+						+ ".", key));
+			}
+			iterator.tryNext();
+		}
 		return toRet;
 	}
-	public void autoWrittenDeSerializeCode(){
-		name = ((StringEntry)readField("name", new StringEntry(""))).getString();
-		level_w = ((StringEntry)readField("level_w", new StringEntry(""))).getString();
-		level_h = ((StringEntry)readField("level_h", new StringEntry(""))).getString();
-		level_xo = ((StringEntry)readField("level_xo", new StringEntry(""))).getString();
-		level_yo = ((StringEntry)readField("level_yo", new StringEntry(""))).getString();
-		orientation = ((StringEntry)readField("orientation", new StringEntry("0"))).getString();
-		duration = ((StringEntry)readField("duration", new StringEntry("-.5"))).getString();
-		duration_f = (float)((DoubleEntry)readField("duration_f", new DoubleEntry())).getDouble();
-		duration_b = ((IntEntry)readField("duration_b", new IntEntry())).getInt()==1;
-		health = (float)((DoubleEntry)readField("health", new DoubleEntry(1))).getDouble();
-		health0 = (float)((DoubleEntry)readField("health0", new DoubleEntry())).getDouble();
-		addBgs = ((StringEntry)readField("addBgs", new StringEntry(""))).getString();
-		myInstanceName = ((StringEntry)readField("myInstanceName", new StringEntry(""))).getString();
-		start_time = (float)((DoubleEntry)readField("start_time", new DoubleEntry())).getDouble();
+
+	public void autoWrittenDeSerializeCode() {
+		name = ((StringEntry) readField("name", new StringEntry("")))
+				.getString();
+		level_w = ((StringEntry) readField("level_w", new StringEntry("")))
+				.getString();
+		level_h = ((StringEntry) readField("level_h", new StringEntry("")))
+				.getString();
+		level_xo = ((StringEntry) readField("level_xo", new StringEntry("")))
+				.getString();
+		level_yo = ((StringEntry) readField("level_yo", new StringEntry("")))
+				.getString();
+		orientation = ((StringEntry) readField("orientation", new StringEntry(
+				"0"))).getString();
+		duration = ((StringEntry) readField("duration", new StringEntry("-.5")))
+				.getString();
+		duration_f = (float) ((DoubleEntry) readField("duration_f",
+				new DoubleEntry())).getDouble();
+		duration_b = ((IntEntry) readField("duration_b", new IntEntry()))
+				.getInt() == 1;
+		health = (float) ((DoubleEntry) readField("health", new DoubleEntry(1)))
+				.getDouble();
+		health0 = (float) ((DoubleEntry) readField("health0", new DoubleEntry()))
+				.getDouble();
+		addBgs = ((StringEntry) readField("addBgs", new StringEntry("")))
+				.getString();
+		myInstanceName = ((StringEntry) readField("myInstanceName",
+				new StringEntry(""))).getString();
+		start_time = (float) ((DoubleEntry) readField("start_time",
+				new DoubleEntry())).getDouble();
 	}
-	public void autoWrittenSerializeCode(){
+
+	public void autoWrittenSerializeCode() {
 		writeField("name", new StringEntry(name));
 		writeField("level_w", new StringEntry(level_w));
 		writeField("level_h", new StringEntry(level_h));
@@ -281,7 +327,7 @@ public class BulletSpellCard extends BulletExpressionGameDB implements GameDataB
 		writeField("orientation", new StringEntry(orientation));
 		writeField("duration", new StringEntry(duration));
 		writeField("duration_f", new DoubleEntry(duration_f));
-		writeField("duration_b", new IntEntry(duration_b?1:0));
+		writeField("duration_b", new IntEntry(duration_b ? 1 : 0));
 		writeField("health", new DoubleEntry(health));
 		writeField("health0", new DoubleEntry(health0));
 		writeField("addBgs", new StringEntry(addBgs));
@@ -289,6 +335,4 @@ public class BulletSpellCard extends BulletExpressionGameDB implements GameDataB
 		writeField("start_time", new DoubleEntry(start_time));
 	}
 
-	
-	
 }
