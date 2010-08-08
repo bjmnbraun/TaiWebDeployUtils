@@ -20,7 +20,6 @@ import com.iabcinc.jmep.Environment;
 import com.iabcinc.jmep.XExpression;
 
 import TaiGameCore.TaiDAWG.WordByRef;
-import TaiScript.parsing.TaiScriptEditor;
 
 
 /**

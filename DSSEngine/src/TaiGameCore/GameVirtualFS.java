@@ -200,11 +200,10 @@ public class GameVirtualFS {
 		((PGraphicsOpenGL) g.g).setUnmodifiablePImage(p);
 	}
 
+	/**
 	private HashMap<String, TaiShaders> shaders = new HashMap();
 
-	/**
 	 * Should be called inside gl's draw action.
-	 */
 	public TaiShaders loadShader(String string, GL2 gl) {
 		TaiShaders got = shaders.get(string);
 		if (got != null) {
@@ -217,6 +216,7 @@ public class GameVirtualFS {
 		shaders.put(string, got);
 		return got;
 	}
+	 */
 
 	public String getStringResource(String string, String startAt) {
 		String vertTxt = null;
@@ -286,11 +286,13 @@ public class GameVirtualFS {
 			g.removeCache(also);
 			imgs.remove(filename);
 		}
+		/*
 		if (res instanceof TaiShaders) {
 			TaiShaders resT = (TaiShaders) res;
 			shaders.remove(filename);
 			resT.cleanup();
 		}
+		*/
 	}
 
 	private HashMap<String, AwtPfontLink> awtFonts = new HashMap(5);

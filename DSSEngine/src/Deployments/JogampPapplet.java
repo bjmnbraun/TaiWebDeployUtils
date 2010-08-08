@@ -11,8 +11,6 @@ import javax.media.opengl.awt.GLCanvas;
 import processing.core.PApplet;
 import processing.opengl.PGraphicsOpenGL;
 
-import com.jogamp.opengl.util.Animator;
-
 /** Shows how to deploy an applet using JOGL. This demo must be
     referenced from a web page via an &lt;applet&gt; tag. */
 
@@ -23,8 +21,46 @@ public class JogampPapplet extends PApplet {
 		frameRateTarget = val * 2;
 	}
 
+	public String getSketchRenderer(){
+		//Prevent the p3d from being defaulted to on the first frame.
+		//Thus, do not render anything in setup()!!!
+		return OPENGL;
+	}
+	
+	private boolean started = false;
 	public void start() {
+		if (started){
+			return;
+		}
+		started = true;
+		Thread j = new Thread(){
+			public void run(){
+				JogampPapplet.super.init();
+			}
+		};
+		j.start();
+		
+		setLayout(new BorderLayout());
+		canvas = new GLCanvas();
+		canvas.addGLEventListener(new Jogl2Adaptor());
+		canvas.setSize(getSize());
+		add(canvas, BorderLayout.CENTER);
 
+		/*
+		animator = new FPSAnimator(canvas, 60);
+		animator.start();
+		*/
+		
+		try {
+			j.join();
+		} catch (InterruptedException e) {
+			e.printStackTrace();
+		}
+		new Thread() {
+			public void run() {
+				beginLoop();
+			}
+		}.start();
 	}
 
 	private PGraphicsOpenGL superG;
@@ -36,36 +72,14 @@ public class JogampPapplet extends PApplet {
 			//setup();
 		}
 		superG.gl = gl;
+		//Setup called on frameCount==0
 		handleDraw();
 	}
 
 	private GLCanvas canvas;
 
 	public void init() {
-		super.init();
 
-		setLayout(new BorderLayout());
-		canvas = new GLCanvas();
-		canvas.addGLEventListener(new Jogl2Adaptor());
-		canvas.setSize(getSize());
-
-		add(canvas, BorderLayout.CENTER);
-
-		try {
-			setup();
-		} catch (RendererChangeException e) {
-			//Nothing.
-		}
-
-		/*
-		animator = new FPSAnimator(canvas, 60);
-		animator.start();
-		*/
-		new Thread() {
-			public void run() {
-				beginLoop();
-			}
-		}.start();
 	}
 
 	/**
@@ -103,6 +117,7 @@ public class JogampPapplet extends PApplet {
 			//##########################################################################
 
 			// Draw one frame
+			
 			canvas.display();
 
 			//##########################################################################

@@ -1,15 +1,12 @@
 package TaiGameCore;
 
-import BulletGame$2.BulletGlobals;
-import BulletGame$2.BulletHellEnv;
-import Deployments.BulletHell.BulletGame$1Engine$GROUND;
-
 import com.iabcinc.jmep.Environment;
 import com.iabcinc.jmep.Expression;
 import com.iabcinc.jmep.XExpression;
 import com.iabcinc.jmep.XIllegalFunctionCall;
 
 public class MultiExpression {
+	/*
 	public static void main(String[] args) throws XExpression {
 		MultiExpression m = new MultiExpression(
 				"((1+1)+(1+1))*4+1-2+3-5+3",
@@ -26,6 +23,7 @@ public class MultiExpression {
 		System.out.println("Throughput (in 1/60th of a second):  = " + rate
 				/ 60);
 	}
+	*/
 
 	/**
 	 * Used if you want to override default behavior
@@ -34,12 +32,19 @@ public class MultiExpression {
 
 	}
 
+	public interface ExpressionPreprocessor {
+		public String processExpression(String expression);
+	}
 	public MultiExpression(String expression, Environment env,
-			BulletGlobals defines) throws XExpression {
-		try {
-			expression = defines.replaceGlobalConstants(expression);
-		} catch (Throwable e) {
-			throw new XExpression(0, e.getMessage());
+			ExpressionPreprocessor ... processors) throws XExpression {
+		for(ExpressionPreprocessor k : processors){
+			if (k!=null){
+				try {
+					expression = k.processExpression(expression);
+				} catch (Throwable e) {
+					throw new XExpression(0, e.getMessage());
+				}
+			}
 		}
 		expression = expression.trim();
 		if (expression.startsWith("{")) {

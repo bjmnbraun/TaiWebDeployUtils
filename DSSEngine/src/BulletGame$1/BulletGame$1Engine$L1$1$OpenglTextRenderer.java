@@ -16,10 +16,9 @@ import processing.opengl.PGraphicsOpenGL;
 import TaiGameCore.GameDataBase;
 import TaiGameCore.PressTypeThreshold;
 import TaiGameCore.TaiImgMap;
-import TaiGameCore.TaiShaders;
+import TaiGameCore.TaiScriptEditor;
+import TaiGameCore.TaiScriptTxtInfo;
 import TaiGameCore.TaiVBO;
-import TaiScript.parsing.TaiScriptEditor;
-import TaiScript.parsing.TaiScriptTxtInfo;
 
 public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 		BulletGame$1Engine$ABasicEngine {
@@ -64,7 +63,6 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			}
 			//Shader initialization
 			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
-			myShaders = FILE_SYSTEM.loadShader("Shader2", gl);
 			FontGlyphStorage = new TaiImgMap(numberOfGlyphsSqrt
 					* numberOfGlyphsSqrt, FontStorageSize);
 			TextBuffer = new TaiVBO(gl);
@@ -115,30 +113,13 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			}
 		}
 
-		TaiShaders myShaders;
 		TaiImgMap FontGlyphStorage;
 		TaiVBO TextBuffer;
 
 		public boolean hasMouseFocus = true;
 
 		public void draw() {
-			mouseLoc = new float[] {
-					(g.mouseX / (float) g.width - textR.x)
-							/ (float) textR.width,
-					(g.mouseY / (float) g.height - textR.y)
-							/ (float) textR.height };
-
 			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
-			// isTextModified |= g.mousePressed;
-			isTextModified |= isResized; // The coordinates change.
-			if (tse.CaretLine > WindowLine + linesToShow - 1) {
-				isTextModified = true; // New perspectives!
-				WindowLine += tse.CaretLine - (WindowLine + linesToShow - 1);
-			}
-			if (tse.CaretLine < WindowLine) {
-				isTextModified = true;// New perspectives!
-				WindowLine -= WindowLine - tse.CaretLine;
-			}
 			float textDistance = 4; // Sadly, my text renderer doesn't support
 			// perspective yet.
 			if (drawBG) {
@@ -161,50 +142,29 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			screen2D4GL(640, 480);
 			GL_X = 0;
 			GL_Y = 0;
-			// ?
-			if (isTextModified) {
-				TextBuffer.reset();
-			}
+			handleFrameModificationLogic();
+			
 			int k = WindowLine;
-			boolean showScrollUpArrow = k > 0;
-			boolean showScrollDownArrow = (tse.Editing.size() - k) * RowHeight > 1;
-			if (isTextModified || !tse.Selection.isEmpty() || true) {
-				gl.glPushMatrix();
+			
+			gl.glPushMatrix();
 				for (; k < WindowLine + linesToShow && k < tse.Editing.size(); k++) {
 					float oldH = -textDistance;// sin(k/5f)*2-4;
 					float newH = -textDistance * 1;// sin((k+1)/5f)*2-4;
 					GL_X += LEFT_TXT_INDENT; // A little offset.
-					textRow(k, oldH, newH, isTextModified, new float[] { 1, 1,
-							1, 1 });
+					textRow(k, oldH, newH, isTextModified, GL_X, GL_Y, 1);
 					GL_X = 0;
 					gl.glTranslatef(0, -GL_Y + (GL_Y += RowHeight), 0);
 				}
-				gl.glPopMatrix();
-			}
-			textWasModifiedThisFrame = isTextModified;
-			isTextModified = false;
-			gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
-
-			// So, draw the TEXT on top of the other stuff:
-			myShaders.switchToShader(myShaders);
-			boolean oldVal = ((PGraphicsOpenGL) g.g).MAKE_MIPMAPS;
-			((PGraphicsOpenGL) g.g).MAKE_MIPMAPS = false;
-			(((PGraphicsOpenGL) g.g)).bindTexture(FontGlyphStorage
-					.getCombinedImage());
-			((PGraphicsOpenGL) g.g).MAKE_MIPMAPS = oldVal;
-			// int id =
-			// ((PGraphicsOpenGL.ImageCache)smiley.getCache(g.g)).tindex;
-			gl.glEnable(GL.GL_TEXTURE_2D);
-			TextBuffer.CurrentColor[0] = g.red(g.g.fillColor) / 255.f;
-			TextBuffer.CurrentColor[1] = g.green(g.g.fillColor) / 255.f;
-			TextBuffer.CurrentColor[2] = g.blue(g.g.fillColor) / 255.f;
-			TextBuffer.drawQueuedElements();
-			gl.glDisable(GL.GL_TEXTURE_2D);
-			myShaders.switchToShader(null);
+			gl.glPopMatrix();
+			
+			renderToGL();
+			
 			screen2D();
 			if (arrowScroll != null) {
 				float rh = Math.max(RowHeight, .11f);
 				float arrowWidth = rh, arrowHeight = rh * 1.8f;
+				boolean showScrollUpArrow = WindowLine > 0;
+				boolean showScrollDownArrow = (tse.Editing.size() - WindowLine) * RowHeight > 1;
 				if (showScrollUpArrow) {
 					g.pushMatrix();
 					g.translate(1 - arrowWidth, arrowHeight);
@@ -222,8 +182,54 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 				}
 			}
 		}
+		/**
+		 * To be called once each frame, before rendering text.
+		 */
+		private void handleFrameModificationLogic() {
+			// isTextModified |= g.mousePressed;
+			isTextModified |= isResized; // The coordinates change.
+			if (tse.CaretLine > WindowLine + linesToShow - 1) {
+				isTextModified = true; // New perspectives!
+				WindowLine += tse.CaretLine - (WindowLine + linesToShow - 1);
+			}
+			if (tse.CaretLine < WindowLine) {
+				isTextModified = true;// New perspectives!
+				WindowLine -= WindowLine - tse.CaretLine;
+			}
+			if (isTextModified) {
+				TextBuffer.reset();
+			}
+		}
 
-		private float[] mouseLoc;
+		/**
+		 * Pushes the text buffer to the screen.
+		 */
+		private void renderToGL(){
+			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
+			
+			textWasModifiedThisFrame = isTextModified;
+			isTextModified = false;
+			
+			gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+
+			// So, draw the TEXT on top of the other stuff:
+			boolean oldVal = ((PGraphicsOpenGL) g.g).MAKE_MIPMAPS;
+			((PGraphicsOpenGL) g.g).MAKE_MIPMAPS = false;
+			(((PGraphicsOpenGL) g.g)).bindTexture(FontGlyphStorage
+					.getCombinedImage());
+			((PGraphicsOpenGL) g.g).MAKE_MIPMAPS = oldVal;
+			// int id =
+			// ((PGraphicsOpenGL.ImageCache)smiley.getCache(g.g)).tindex;
+			gl.glEnable(GL.GL_TEXTURE_2D);
+			TextBuffer.CurrentColor[0] = g.red(g.g.fillColor) / 255.f;
+			TextBuffer.CurrentColor[1] = g.green(g.g.fillColor) / 255.f;
+			TextBuffer.CurrentColor[2] = g.blue(g.g.fillColor) / 255.f;
+			TextBuffer.drawQueuedElements();
+			gl.glDisable(GL.GL_TEXTURE_2D);
+
+		}
+
+		private float[] mouseLoc = new float[2];
 		public String arrowScroll = null;
 
 		public void setArrowScrollGraphic(String arrow) {
@@ -247,9 +253,17 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 		}
 
 		private void textRow(final int k, final float oldH, final float newH,
-				final boolean addToShader, final float[] Txtcolor) {
+				final boolean addToShader, float GL_X, float GL_Y, float maxW) {
+			mouseLoc[0] = 
+					(g.mouseX / (float) g.width - textR.x)
+							/ (float) textR.width;
+			mouseLoc[1] = 
+					(g.mouseY / (float) g.height - textR.y)
+							/ (float) textR.height;
+
 			long now = System.nanoTime();
 
+			float GL_X_0 = GL_X;
 			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
 			int bestIndex = -1;
 			float[] highlightColor = new float[] { 31 / 255f, 79 / 255f,
@@ -267,7 +281,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 				boolean addToShaderTmp = addToShader;
 				boolean lineEnd = false;
 				boolean skipDraw = false;
-				if (GL_X > 1) {
+				
+				if (GL_X-GL_X_0 > maxW) { //Over.
 					lineEnd = true;
 					skipDraw = true;
 				}
@@ -300,7 +315,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 						 **/
 						char lookup = c;
 						if (Character.isWhitespace(c)) {
-							lookup = 'a';
+							lookup = '!';
 						}
 						TextFontTmp = FILE_SYSTEM.getPFontFor(defaultToFont,
 								lookup, defaultToFontSize);
@@ -390,11 +405,12 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 								position[1], imgWidth, imgHeight);
 
 						//ADD!
-						TextBuffer.addNgon(4, Shader1VertShader.Center_X, GL_X
-								+ center[0], Shader1VertShader.Center_Y, GL_Y
-								+ center[1], Shader1VertShader.RectWidth,
-								sizes[0], Shader1VertShader.RectHeight,
-								sizes[1], Shader1VertShader.Rotation, 0f,
+						TextBuffer.addNgon(4, 
+								Shader1VertShader.Center_X, GL_X + center[0],
+								Shader1VertShader.Center_Y, GL_Y + center[1],
+								Shader1VertShader.RectWidth, sizes[0],
+								Shader1VertShader.RectHeight, sizes[1],
+								Shader1VertShader.Rotation, 0f,
 								Shader1VertShader.X_TexOffset, chunk[0],
 								Shader1VertShader.Y_TexOffset, chunk[1],
 								Shader1VertShader.TexScaleX, chunk[2],
@@ -487,6 +503,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 
 		private void drawPaperBackgroundRow(int k, float oldH, float newH) {
 			g.noStroke();
+			//push fillcolor
+			int color = g.g.fillColor;
 			g.fill(rowNoise[k % rowNoise.length]);
 			g.beginShape();
 			g.vertex(0, 0, oldH);
@@ -494,6 +512,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			g.vertex(1, RowHeight, newH);
 			g.vertex(0, RowHeight, newH);
 			g.endShape();
+			g.fill(color);
 		}
 
 		public boolean isTextModified = true;
@@ -819,12 +838,35 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			ets.draw();
 			viewport(0, 0, 1, 1);
 		}
+		
+		public void beginMultitext(){
+			ets.handleFrameModificationLogic();
+		}
+		/**
+		 * Draws a single line of the text buffer to a given offset coordinate.
+		 * The area rectangle is effectively ignored in this rendering mode.
+		 * 
+		 * This is useful because it conserves font resources by using a single text component
+		 * to render multiple, disconnected, text boxes. To achieve this, simply write each
+		 * individual component's text to different lines (with setTextRow), and then draw
+		 * each with drawTextRow.
+		 * 
+		 * Call beginMultitext before rendering lines, and finish with endMultitext
+		 */
+		public void drawMultitextRow(int linenumber, float x, float y){
+			ets.scaleText(txtScl);
+			ets.textRow(linenumber, 0, 0, ets.isTextModified, x, y, 1);
+		}
+		public void endMultitext (){
+			ets.renderToGL();
+		}
 
 		public void cleanup() {
 			ets.cleanup();
 			removeSubKeyListener(ets);
 		}
 	}
+	
 
 	public class SaveGameDialog extends ModalDialog {
 		public SaveGameDialog(BulletGameScreen parent, final Runnable doAfter,
