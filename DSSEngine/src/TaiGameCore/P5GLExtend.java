@@ -24,14 +24,14 @@ import processing.core.PMatrix3D;
 import processing.opengl.PGraphicsOpenGL;
 import BulletGame$1.BulletGame$1Engine$ABasicEngine.ModalDialog;
 
-public class ProceGLHybrid extends KeyAdapter {
+public class P5GLExtend extends KeyAdapter {
 	public PApplet g;
 	public int currentViewPortWidth;
 	public int currentViewPortHeight;
 	public int currentViewPortX;
 	public int currentViewPortY;
 
-	public ProceGLHybrid(PApplet hold) {
+	public P5GLExtend(PApplet hold) {
 		g = hold;
 		if (g != null) {
 			g.registerDispose(this);
@@ -240,21 +240,6 @@ public class ProceGLHybrid extends KeyAdapter {
 		klist.add(kl);
 	}
 
-	/**
-	 * Trivial utilities section. You can rely on these because I have no reason to take them out. 
-	 */
-	public void fill(int[] color) {
-		g.fill(color[0], color[1], color[2]);
-	}
-
-	public void stroke(int[] color) {
-		g.stroke(color[0], color[1], color[2]);
-	}
-
-	public int color(int[] color) {
-		return g.color(color[0], color[1], color[2]);
-	}
-
 	public void outlineViewport() {
 		g.stroke(0);
 		g.noFill();
@@ -266,8 +251,24 @@ public class ProceGLHybrid extends KeyAdapter {
 
 	}
 
-	public void rect(Rectangle2D.Float r) {
-		g.rect(r.x, r.y, r.width, r.height);
+	/**
+	 * Renders a rectangle, just outside the coordinates specified by r.
+	 */
+	public void rectB(Rectangle2D.Float r) {
+		g.rect(((int)(r.x * currentViewPortWidth)) / (float)currentViewPortWidth, 
+				((int)(r.y * currentViewPortHeight)) / (float)currentViewPortHeight,
+				((int)((r.x + r.width) * currentViewPortWidth)) / (float)currentViewPortWidth - r.x,
+				((int)((r.y + r.height) * currentViewPortHeight)) / (float)currentViewPortHeight - r.y);
+	}
+	
+	/**
+	 * Not strictly inside, exactly on border is "in".
+	 */
+	public boolean isInRect(Rectangle2D.Float r, float x, float y) {
+		boolean isInX = r.x <= x && r.x + r.width >= x;
+		if (!isInX) return isInX;
+		boolean isInY = r.y <= y && r.y + r.height >= y;
+		return isInY;
 	}
 
 	/**
@@ -295,5 +296,11 @@ public class ProceGLHybrid extends KeyAdapter {
 
 	public boolean truth(Boolean k) {
 		return !(k == null) && (k == true);
+	}
+	
+	public static class RArea extends Rectangle2D.Float {
+		public RArea(double f, double g, double h, double i) {
+			super((float)f,(float)g,(float)h,(float)i);
+		}
 	}
 }

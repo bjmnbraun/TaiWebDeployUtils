@@ -8,13 +8,13 @@ import javax.media.opengl.GLEventListener;
 import javax.media.opengl.awt.AWTGLAutoDrawable;
 import javax.media.opengl.awt.GLCanvas;
 
-import processing.core.PApplet;
 import processing.opengl.PGraphicsOpenGL;
+import BulletGame$1.BulletGame$1Engine$L1$2$P5Link;
 
 /** Shows how to deploy an applet using JOGL. This demo must be
     referenced from a web page via an &lt;applet&gt; tag. */
 
-public class JogampPapplet extends PApplet {
+public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 	public void frameRate(float val) {
 		super.frameRate(val);
 

@@ -22,7 +22,7 @@ import processing.opengl.PGraphicsOpenGL;
 import processing.opengl.GLPersist.GLPersistCB;
 import TaiGameCore.GameSprite;
 import TaiGameCore.GameVirtualFS;
-import TaiGameCore.ProceGLHybrid;
+import TaiGameCore.P5GLExtend;
 import TaiGameCore.GameSprite.GameGraphic;
 import TaiGameCore.RelativelyTimed.RelativeTimeNode;
 import TaiGameCore.RelativelyTimed.TimeSource;
@@ -36,7 +36,7 @@ import ddf.minim.Minim;
  * Instantiate a subclass to provide more and more screens. (See
  * bulletGame$1Engine$L{N}, so that N is large.)
  */
-public abstract class BulletGame$1Engine$ABasicEngine extends ProceGLHybrid {
+public abstract class BulletGame$1Engine$ABasicEngine extends P5GLExtend {
 	/**
 	 * Game genesis follows
 	 */
