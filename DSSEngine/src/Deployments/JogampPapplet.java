@@ -26,6 +26,21 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 		//Thus, do not render anything in setup()!!!
 		return OPENGL;
 	}
+	public void setSynchWithFirstGlDisplay(syncGLAwtTransfer r){
+		syncWithFirstGLDisplay = r;
+	}
+	public interface syncGLAwtTransfer {
+		public boolean isAWTLoadFinished();
+	}
+	private syncGLAwtTransfer syncWithFirstGLDisplay = new syncGLAwtTransfer(){
+		public boolean isAWTLoadFinished() {
+			return true;
+		}
+	};
+	/**
+	 * Don't load the game, just test a red screen.
+	 */
+	private boolean TEST_APPLET = false;
 	
 	private boolean started = false;
 	public void start() {
@@ -33,29 +48,16 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 			return;
 		}
 		started = true;
-		Thread j = new Thread(){
-			public void run(){
-				JogampPapplet.super.init();
-			}
-		};
-		j.start();
 		
 		setLayout(new BorderLayout());
 		canvas = new GLCanvas();
 		canvas.addGLEventListener(new Jogl2Adaptor());
-		canvas.setSize(getSize());
 		add(canvas, BorderLayout.CENTER);
-
-		/*
-		animator = new FPSAnimator(canvas, 60);
-		animator.start();
-		*/
 		
-		try {
-			j.join();
-		} catch (InterruptedException e) {
-			e.printStackTrace();
+		if (!TEST_APPLET){
+			JogampPapplet.super.init();
 		}
+		
 		new Thread() {
 			public void run() {
 				beginLoop();
@@ -64,22 +66,26 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 	}
 
 	private PGraphicsOpenGL superG;
-
+	private boolean awtLoadFinished = false;
+	public boolean isAWTLoadFinished(){
+		return awtLoadFinished;
+	}
+	
 	public void superDisplay(GL2 gl) {
-		if (superG == null) {
+		if (superG == null && g!=null) {
 			superG = (PGraphicsOpenGL) g;
 			superG.gl = gl;
-			//setup();
 		}
-		superG.gl = gl;
-		//Setup called on frameCount==0
-		handleDraw();
+		if (superG!=null){
+			superG.gl = gl;
+			handleDraw();
+		}
 	}
 
 	private GLCanvas canvas;
 
 	public void init() {
-
+		
 	}
 
 	/**
@@ -116,8 +122,14 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 			//##########################################################################
 			//##########################################################################
 
-			// Draw one frame
+			//Second frame is first ability to swap
+			if (frameCount>=2 && !awtLoadFinished){
+				if (syncWithFirstGLDisplay.isAWTLoadFinished()){
+					awtLoadFinished = true;
+				}
+			}
 			
+			// Draw one frame
 			canvas.display();
 
 			//##########################################################################
@@ -194,7 +206,10 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 		public void reshape(GLAutoDrawable drawable, int x, int y, int width,
 				int height) {
 			GL2 gl = drawable.getGL().getGL2();
-			JogampPapplet.this.resizeRenderer(width, height);
+			if (g!=null && (width!=g.width || height != g.height)){
+				System.out.println("RESIZE");
+				JogampPapplet.this.resizeRenderer(width, height);
+			}
 		}
 
 		public void dispose(GLAutoDrawable drawable) {
@@ -209,5 +224,9 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 		public void displayChanged(GLAutoDrawable drawable,
 				boolean modeChanged, boolean deviceChanged) {
 		}
+	}
+
+	public void resizeRenderer2(int iwidth, int iheight) {
+		resizeRenderer(iwidth, iheight);
 	}
 }

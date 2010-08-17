@@ -627,9 +627,11 @@ public class PGraphicsOpenGL extends PGraphics3D {
 	 * is implemented.
 	 */
 	protected void renderLines(int start, int stop) {
-		report("render_lines in");
+		//report("render_lines in");
 
 		//int i = 0;
+		boolean lastWasLine = false;
+		boolean hasPendingEnd = false;
 		for (int j = 0; j < pathCount; j++) {
 			int i = pathOffset[j];
 			float sw = vertices[lines[i][VERTEX1]][SW];
@@ -637,8 +639,25 @@ public class PGraphicsOpenGL extends PGraphics3D {
 			// stroke weight zero will cause a gl error
 			if (sw > 0) {
 				// glLineWidth has to occur outside glBegin/glEnd
-				gl.glLineWidth(sw);
-				gl.glBegin(GL.GL_LINE_STRIP);
+				if (pathLength[j]!=1){
+					if (hasPendingEnd){
+						gl.glEnd();
+					}
+					gl.glLineWidth(sw);
+					gl.glBegin(GL.GL_LINE_STRIP);
+					hasPendingEnd = true;
+					lastWasLine = false;
+				} else {
+					if (!lastWasLine){
+						if (hasPendingEnd){
+							gl.glEnd();
+						}
+						gl.glLineWidth(sw);
+						gl.glBegin(GL.GL_LINES);
+						hasPendingEnd = true;
+					}
+					lastWasLine = true;
+				}
 
 				// always draw a first point
 				float a[] = vertices[lines[i][VERTEX1]];
@@ -654,8 +673,11 @@ public class PGraphicsOpenGL extends PGraphics3D {
 					gl.glVertex3f(b[VX], b[VY], b[VZ]);
 					i++;
 				}
-				gl.glEnd();
 			}
+		}
+		if (hasPendingEnd){
+			gl.glEnd();
+			hasPendingEnd = false;
 		}
 		report("render_lines out");
 	}
@@ -2640,8 +2662,6 @@ public class PGraphicsOpenGL extends PGraphics3D {
 
 	IntBuffer getsetBuffer = Buffers.newDirectIntBuffer(1);
 
-	//  int getset[] = new int[1];
-
 	public int get(int x, int y) {
 		gl.glReadPixels(x, y, 1, 1, GL.GL_RGBA, GL.GL_UNSIGNED_BYTE,
 				getsetBuffer);
@@ -2687,6 +2707,7 @@ public class PGraphicsOpenGL extends PGraphics3D {
 			getset = (argb & 0xff00ff00) | ((argb << 16) & 0xff0000)
 					| ((argb >> 16) & 0xff);
 		}
+
 		getsetBuffer.put(0, getset);
 		getsetBuffer.rewind();
 		//gl.glRasterPos2f(x + EPSILON, y + EPSILON);

@@ -14,8 +14,6 @@ import java.util.HashMap;
 import java.util.Set;
 import java.util.Map.Entry;
 
-import javax.media.opengl.GL2;
-
 import processing.core.PApplet;
 import processing.core.PFont;
 import processing.core.PImage;
@@ -75,6 +73,7 @@ public class GameVirtualFS {
 		});
 	}
 	 */
+	/*
 	public String getBaseCreatedFilesDirectory() {
 		String userDir = System.getProperty("user.home") + File.separator
 				+ ".bullethell1";
@@ -83,6 +82,7 @@ public class GameVirtualFS {
 		}
 		return userDir;
 	}
+	*/
 
 	public String getBaseJarUrl() {
 		String whole = GameVirtualFS.class.getResource("").toString();

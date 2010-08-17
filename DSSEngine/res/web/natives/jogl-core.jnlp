@@ -14,7 +14,7 @@
   </security>
     <resources>
       <jar href="jogl.core.jar" main="true"/>
-      <jar href="jogl.util.jar" download="lazy"/>
+      <jar href="jogl.util.jar" download="lazy" />
 
       <extension name="gluegen-rt"   href="{DESTINATION_URL_DIR}/gluegen-rt.jnlp" />
       <extension name="nativewindow" href="{DESTINATION_URL_DIR}/nativewindow.jnlp" />
