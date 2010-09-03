@@ -1,7 +1,5 @@
 package Deployments;
 
-import java.awt.BorderLayout;
-
 import javax.media.opengl.GL2;
 import javax.media.opengl.GLAutoDrawable;
 import javax.media.opengl.GLEventListener;
@@ -34,7 +32,7 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 	}
 	private syncGLAwtTransfer syncWithFirstGLDisplay = new syncGLAwtTransfer(){
 		public boolean isAWTLoadFinished() {
-			return true;
+			return false;
 		}
 	};
 	/**
@@ -49,10 +47,11 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 		}
 		started = true;
 		
-		setLayout(new BorderLayout());
 		canvas = new GLCanvas();
+		canvas.setVisible(false);
+		canvas.setBackground(getBackground());
 		canvas.addGLEventListener(new Jogl2Adaptor());
-		add(canvas, BorderLayout.CENTER);
+		add(canvas);
 		
 		if (!TEST_APPLET){
 			JogampPapplet.super.init();
@@ -78,12 +77,17 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 		}
 		if (superG!=null){
 			superG.gl = gl;
+			
 			handleDraw();
 		}
 	}
 
 	private GLCanvas canvas;
-
+	
+	public GLCanvas getCanvas(){
+		return canvas;
+	}
+	
 	public void init() {
 		
 	}
@@ -128,6 +132,7 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 					awtLoadFinished = true;
 				}
 			}
+
 			
 			// Draw one frame
 			canvas.display();
@@ -207,7 +212,7 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 				int height) {
 			GL2 gl = drawable.getGL().getGL2();
 			if (g!=null && (width!=g.width || height != g.height)){
-				System.out.println("RESIZE");
+				//System.out.println("RESIZE");
 				JogampPapplet.this.resizeRenderer(width, height);
 			}
 		}
@@ -229,4 +234,6 @@ public class JogampPapplet extends BulletGame$1Engine$L1$2$P5Link {
 	public void resizeRenderer2(int iwidth, int iheight) {
 		resizeRenderer(iwidth, iheight);
 	}
+	
+	
 }

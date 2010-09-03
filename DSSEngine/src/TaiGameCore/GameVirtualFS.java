@@ -115,7 +115,7 @@ public class GameVirtualFS {
 			return got;
 		}
 		try {
-			URL srcU = new URL(getBaseJarUrl() + "embed/font/" + string);//Get under the bulletGame$1package, then out of bin.
+			URL srcU = getSrcUrlForString(string, getFontBase());//Get under the bulletGame$1package, then out of bin.
 			//System.out.println(srcU);
 			got = new PFont(srcU.openStream());
 		} catch (IOException e) {
@@ -125,6 +125,25 @@ public class GameVirtualFS {
 		return got;
 	}
 
+	/**
+	 * To be overriden by other filesystems
+	 */
+	public String getFontBase() {
+		return "embed/font/";
+	}
+	/**
+	 * To be overriden by other filesystems
+	 */
+	public String getImgBase() {
+		return "embed/imgs/";
+	}
+	/**
+	 * To be overriden by other filesystems
+	 */
+	public String getSoundBase() {
+		return "embed/sound/";
+	}
+	
 	public URL getSrcUrlForString(String string, String base)
 			throws IOException {
 		URL srcU = null;
@@ -143,12 +162,13 @@ public class GameVirtualFS {
 			public void run() {
 				//System.out.println(srcU);
 				try {
-					URL srcU = getSrcUrlForString(string, "embed/imgs/");
+					URL srcU = getSrcUrlForString(string, getImgBase());
 					InputStream openStream = srcU.openStream();
 					openStream.close();
 					got[0] = g.loadImage(srcU.toString());
 				} catch (IOException e) {
 					got[0] = null;
+					//e.printStackTrace();
 				}
 				done[0] = true;
 			}
@@ -231,7 +251,7 @@ public class GameVirtualFS {
 
 	public AudioPlayer loadAudioFile(String string, Minim m) {
 		try {
-			URL srcU = getSrcUrlForString(string, "embed/sound/");
+			URL srcU = getSrcUrlForString(string, getSoundBase());
 			return m.loadFile(srcU.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -241,7 +261,7 @@ public class GameVirtualFS {
 
 	public AudioSample loadAudioSample(String string, Minim m) {
 		try {
-			URL srcU = getSrcUrlForString(string, "embed/sound/");
+			URL srcU = getSrcUrlForString(string, getSoundBase());
 			return m.loadSample(srcU.toString());
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -343,5 +363,10 @@ public class GameVirtualFS {
 
 	public boolean isOnline() {
 		return getBaseJarUrl().contains("http:");
+	}
+
+	public String getBaseCreatedFilesDirectory() {
+		if (true) throw new RuntimeException();
+		return "";
 	}
 }

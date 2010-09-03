@@ -210,7 +210,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			textWasModifiedThisFrame = isTextModified;
 			isTextModified = false;
 			
-			gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
+			//gl.glClear(GL.GL_DEPTH_BUFFER_BIT);
 
 			// So, draw the TEXT on top of the other stuff:
 			boolean oldVal = ((PGraphicsOpenGL) g.g).MAKE_MIPMAPS;
@@ -226,7 +226,6 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			TextBuffer.CurrentColor[2] = g.blue(g.g.fillColor) / 255.f;
 			TextBuffer.drawQueuedElements();
 			gl.glDisable(GL.GL_TEXTURE_2D);
-
 		}
 
 		private float[] mouseLoc = new float[2];

@@ -1066,9 +1066,9 @@ public class PGraphicsOpenGL extends PGraphics3D {
 			//      gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
 			//      gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
 			gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S,
-					GL.GL_CLAMP_TO_EDGE);
+					GL.GL_TEXTURE_WRAP_S);
 			gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T,
-					GL.GL_CLAMP_TO_EDGE);
+					GL.GL_TEXTURE_WRAP_T);
 
 			//
 
