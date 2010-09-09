@@ -14,7 +14,7 @@ public class TaiImgMap {
 	private int colCount;
 	private int usedImages;
 	private PImage[] images;
-	private float sizeEachX, sizeEachY;
+	public final float sizeEachX, sizeEachY;
 	public TaiImgMap(int numImages, int size){
 		TEX_SIZE = size;
 		rowCount = (int) Math.floor(Math.sqrt(numImages));

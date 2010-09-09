@@ -19,6 +19,9 @@
 package ddf.minim;
 
 import java.io.BufferedInputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -690,8 +693,7 @@ public class Minim {
 				ais = getAudioInputStream(bis);
 				 */
 				try {
-					ais = getAudioInputStream(new BufferedInputStream(
-							new FileInputStream(filename)));
+					ais = getAudioInputStream(new File(filename).toURI().toURL());
 				} catch (UnsupportedAudioFileException e) {
 					e.printStackTrace();
 				}
@@ -706,32 +708,6 @@ public class Minim {
 		return ais;
 	}
 
-	/**
-	 * This method is also part of AppletMpegSPIWorkaround, which uses yet 
-	 * another workaround to load an internet radio stream.
-	 * 
-	 * @param url the URL of the stream
-	 * @return an AudioInputStream of the streaming audio
-	 * @throws UnsupportedAudioFileException
-	 * @throws IOException
-	 */
-	public static AudioInputStream getAudioInputStream(URL url)
-			throws UnsupportedAudioFileException, IOException {
-		return getAudioInputStream(new BufferedInputStream(url.openStream()));
-		/*
-		//alexey fix: we use MpegAudioFileReaderWorkaround with URL and user agent
-		try 
-		{
-			Class.forName("javazoom.spi.mpeg.sampled.file.MpegAudioFileReader");
-			return new MpegAudioFileReaderWorkaround().getAudioInputStream(url, null);
-		} 
-		catch (ClassNotFoundException cnfe) 
-		{
-			throw new IllegalArgumentException("Mpeg codec not properly installed");
-		}
-		 */
-
-	}
 
 	/**
 	 * This method is a replacement for AudioSystem.getAudioInputStream(InputStream),
@@ -744,20 +720,42 @@ public class Minim {
 	 * @throws UnsupportedAudioFileException
 	 * @throws IOException
 	 */
-	public static AudioInputStream getAudioInputStream(InputStream is)
-			throws UnsupportedAudioFileException, IOException {
+	public static AudioInputStream getAudioInputStream(URL url) throws UnsupportedAudioFileException, IOException {
+		
+		InputStream is = new BufferedInputStream(url.openStream(),4096);
+		/*
+		ByteArrayOutputStream baos = new ByteArrayOutputStream();
+		byte[] buffer = new byte[1024];
+		int read = -1;
+		while((read=is.read(buffer))!=-1){
+			baos.write(buffer,0,read);
+		}
+		is.close();
+		ByteArrayInputStream bais = new ByteArrayInputStream(baos.toByteArray());
+		baos = null;
+		is = bais;
+		*/
+		
 		try {
 			Minim.debug("Trying just normal audio system...");
-			return AudioSystem.getAudioInputStream(is);
+			//InputStream is = url.openStream();
+			try {
+				return AudioSystem.getAudioInputStream(is);
+			} finally {
+				//is.close();
+			}
 		} catch (Exception iae) {
 			Minim.debug("Preparing to try mp3 & ogg codecs:");
 			AudioInputStream mp3Ais = null;
 			try {
 				Minim.debug("Using AppletMpegSPIWorkaround to get mp3 codec");
-				Class
-						.forName("javazoom.spi.mpeg.sampled.file.MpegAudioFileReader");
-				mp3Ais = new javazoom.spi.mpeg.sampled.file.MpegAudioFileReader()
-						.getAudioInputStream(is);
+				Class.forName("javazoom.spi.mpeg.sampled.file.MpegAudioFileReader");
+				//InputStream is = url.openStream();
+				try {
+					mp3Ais = new javazoom.spi.mpeg.sampled.file.MpegAudioFileReader().getAudioInputStream(is);
+				} finally {
+					//is.close();
+				}
 			} catch (ClassNotFoundException cnfe) {
 				throw new IllegalArgumentException(
 						"Mpeg codec not properly installed");
@@ -770,7 +768,11 @@ public class Minim {
 			AudioInputStream oggAis = null;
 			try {
 				Minim.debug("Using AppletVorbisSPIWorkaround to get ogg codec");
-				oggAis = AppletVorbisSPIWorkaround.getAudioInputStream(is);
+				try {
+					oggAis = AppletVorbisSPIWorkaround.getAudioInputStream(is);
+				} finally {
+					//is.close();
+				}
 			} catch (Exception e) {
 				//
 				e.printStackTrace();
