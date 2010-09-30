@@ -363,7 +363,11 @@ public abstract class BulletGame$1Engine$ABasicEngine extends P5GLExtend {
 					currentScreen.frozen.beginPersist(1, GL.GL_LINEAR, 0, 0,
 							g.width, g.height); // Copies on first time.
 					currentScreen.frozen.endPersist();
-					currentScreen.cleanup();
+					try {
+						currentScreen.cleanup();
+					} catch (Throwable e){
+						e.printStackTrace();
+					}
 					FILE_SYSTEM.clearImages();
 					// Trigger the next screen
 					shoeingInScreen = SCREEN(nowScreen);
@@ -507,22 +511,23 @@ public abstract class BulletGame$1Engine$ABasicEngine extends P5GLExtend {
 			dialogStoleThePreciousMouseCoord[0] = -1; // invalidate old state
 			// this is a problem when modaldialogs get added mid-frame-draw...
 			dialogStoleThePreciousMouseCoord[1] = -1;
+			parent.denyInput(true);
+			parent.specialModalDialogInputIgnore = true;
+			
 			g.registerDraw(this);
 			addSubKeyListener(this);
 			closeOnEscape = new KeyAdapter() {
 				public void keyPressed(KeyEvent e) {
 					if (e.getKeyCode() == KeyEvent.VK_ESCAPE) {
-						if (parent != null
-								&& !parent.specialModalDialogInputIgnore) {
+						if (parent != null && !parent.specialModalDialogInputIgnore) {
 							modalDialogEscapePressed = true;
+							
 							parent.specialModalDialogInputIgnore = true;
 						}
 					}
 				}
 			};
 			addSubKeyListener(closeOnEscape);
-
-			parent.denyInput(true);
 		}
 
 		private boolean modalDialogEscapePressed = false;
@@ -548,7 +553,7 @@ public abstract class BulletGame$1Engine$ABasicEngine extends P5GLExtend {
 		}
 
 		private void drawUnprotected() {
-			// Fix the escape key freezeing feature
+			// Fix the escape key freezing feature
 			if (g.mousePressed) {
 				parent.specialModalDialogInputIgnore = false;
 			}

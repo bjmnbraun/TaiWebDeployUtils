@@ -55,6 +55,24 @@ public abstract class GameDataBase {
 		@Target(ElementType.FIELD)
 		public @interface FromScript {
 		}
+		
+		/**
+		 * Causes a template being read to autogenerate the getter methods for its fields.
+		 */
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target(ElementType.TYPE)
+		public @interface MakeGetters {
+		}
+		
+		/**
+		 * When the autowriter is run on a class with this annotation, the corresponding template classes
+		 * are loaded and invoked in writing the class.
+		 */
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target(ElementType.TYPE)
+		public @interface ExtendsData {
+			public Class[] parents();
+		}
 
 		/**
 		 * Describes a field that must be provided
