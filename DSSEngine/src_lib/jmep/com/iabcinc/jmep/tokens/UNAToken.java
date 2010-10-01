@@ -46,9 +46,9 @@ public class UNAToken extends Token {
   public int getKindOfUNA() {
     return m_kUNAToken;
   }
-
-  public Object evaluate(Object oValue, int[][] intArrays, float[][] floatArrays, Object[][] objectArrays, int i)
-  throws XIllegalOperation,XIllegalStatus {
+	private int[][] intArrays = new int[1][1];	private float[][] floatArrays = new float[1][1];	private Object[][] objectArrays = new Object[1][1];
+  public Object evaluate(Object oValue, int contextID)
+  throws XIllegalOperation,XIllegalStatus {	  int i = contextID;	  
     if (oValue instanceof int[]) {    	int value = ((int[])oValue)[0];
       switch (m_kUNAToken) {
         case PLS: return oValue;
