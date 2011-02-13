@@ -1028,6 +1028,7 @@ public class PGraphicsOpenGL extends PGraphics3D {
 						GL.GL_RGBA, GL.GL_UNSIGNED_BYTE, tbuffer);
 			}
 
+			
 			int filter = GL.GL_NEAREST;
 			if (source.blit_resize_smooth) {
 				filter = GL.GL_LINEAR;
@@ -1066,12 +1067,12 @@ public class PGraphicsOpenGL extends PGraphics3D {
 			//      gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S, GL.GL_CLAMP);
 			//      gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T, GL.GL_CLAMP);
 			gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_S,
-					GL.GL_TEXTURE_WRAP_S);
+					GL.GL_REPEAT);
 			gl.glTexParameterf(GL.GL_TEXTURE_2D, GL.GL_TEXTURE_WRAP_T,
-					GL.GL_TEXTURE_WRAP_T);
+					GL.GL_REPEAT);
 
 			//
-
+			
 			gl.glTexEnvf(GL2.GL_TEXTURE_ENV, GL2.GL_TEXTURE_ENV_MODE,
 					GL2.GL_MODULATE);
 

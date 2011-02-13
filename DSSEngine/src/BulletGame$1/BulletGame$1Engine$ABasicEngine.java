@@ -23,11 +23,10 @@ import processing.opengl.GLPersist.GLPersistCB;
 import TaiGameCore.GameSprite;
 import TaiGameCore.GameVirtualFS;
 import TaiGameCore.P5GLExtend;
+import TaiGameCore.SinCosLUT;
 import TaiGameCore.GameSprite.GameGraphic;
 import TaiGameCore.RelativelyTimed.RelativeTimeNode;
 import TaiGameCore.RelativelyTimed.TimeSource;
-
-
 import ddf.minim.AudioPlayer;
 import ddf.minim.Minim;
 
@@ -36,7 +35,7 @@ import ddf.minim.Minim;
  * Instantiate a subclass to provide more and more screens. (See
  * bulletGame$1Engine$L{N}, so that N is large.)
  */
-public abstract class BulletGame$1Engine$ABasicEngine extends P5GLExtend {
+public abstract class BulletGame$1Engine$ABasicEngine extends P5GLExtend implements SinCosLUT {
 	/**
 	 * Game genesis follows
 	 */
@@ -740,12 +739,17 @@ public abstract class BulletGame$1Engine$ABasicEngine extends P5GLExtend {
 	}
 
 	public PImage getGameGraphic(GameGraphic toDraw) {
+		String fname = getImgUrlFromGraphic(toDraw);
+		PImage got = FILE_SYSTEM.getImg(fname);
+		return got;
+	}
+
+	public String getImgUrlFromGraphic(GameGraphic toDraw) {
 		String fname = "[default]";
 		if (toDraw != null) {
 			fname = toDraw.filename;
 		}
-		PImage got = FILE_SYSTEM.getImg(fname);
-		return got;
+		return fname;
 	}
 
 	public void drawGameGraphic(GameGraphic gfx, float a, float b, float c,

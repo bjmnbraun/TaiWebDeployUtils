@@ -16,9 +16,6 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 import java.util.zip.ZipOutputStream;
 
-import com.iabcinc.jmep.Environment;
-import com.iabcinc.jmep.XExpression;
-
 import TaiGameCore.TaiDAWG.WordByRef;
 
 
@@ -31,7 +28,7 @@ import TaiGameCore.TaiDAWG.WordByRef;
  */
 public abstract class GameDataBase {
 
-	public static interface StringBase {
+	public static interface StringBase<Assignment> {
 		public static interface Validator{
 			public void validate(String fieldname, String data) throws ValidationException;
 		}
@@ -46,7 +43,7 @@ public abstract class GameDataBase {
 			public String fieldname;
 		};
 
-		public ArrayList<Exception> parseFromStrings(TaiDAWG<String> data, Validator ... valid) throws FieldRequiredException, ValidationException;
+		public ArrayList<Exception> parseFromStrings(TaiDAWG<Assignment> data, Validator ... valid) throws FieldRequiredException, ValidationException;
 
 		/**
 		 * Describes a field that we want to be script editable
@@ -91,7 +88,27 @@ public abstract class GameDataBase {
 		public @interface HasValidator {
 			public int num();
 		}
+		
+		/**
+		 * Describes fields that are processed before being validated, depending on
+		 * their lexical scope.
+		 * 
+		 * The method called to do the processing must reside in the same class as the field declarer.
+		 */
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target(ElementType.TYPE)
+		public @interface ScopePreValidate {
+			public String method();
+		}
 
+		/**
+		 * Describes a field that bypasses the ScopePreValidate step.
+		 */
+		@Retention(RetentionPolicy.RUNTIME)
+		@Target(ElementType.FIELD)
+		public @interface IsUnscoped {
+		}
+		
 		public static class FieldRequiredException extends Exception{
 			public FieldRequiredException(String msg){
 				super(msg);

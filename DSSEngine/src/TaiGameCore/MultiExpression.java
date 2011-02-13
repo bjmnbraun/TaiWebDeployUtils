@@ -35,7 +35,12 @@ public class MultiExpression {
 	public interface ExpressionPreprocessor {
 		public String processExpression(String expression);
 	}
+
 	public MultiExpression(String expression, Environment env,
+			ExpressionPreprocessor ... processors) throws XExpression {
+		this(expression,env,true,processors);
+	}
+	public MultiExpression(String expression, Environment env, boolean wantsFloatValue,
 			ExpressionPreprocessor ... processors) throws XExpression {
 		for(ExpressionPreprocessor k : processors){
 			if (k!=null){
@@ -49,7 +54,7 @@ public class MultiExpression {
 		expression = expression.trim();
 		if (expression.startsWith("{")) {
 			expression = expression.substring(1);
-			//Do multi parsing
+			//Do multi parsing 
 			String[] cases = expression.split("[:&]");
 			if (expression.endsWith(":") || expression.endsWith("&")) {
 				throw new XExpression(0, "Trailing "
@@ -74,7 +79,7 @@ public class MultiExpression {
 			}
 			values = new Expression[cases.length / 2];
 			for (int k = 0; k < values.length; k++) {
-				values[k] = new Expression(cases[k * 2 + 1] + "+0.0", env);
+				values[k] = new Expression(cases[k * 2 + 1] + (wantsFloatValue?"+0.0":""), env);
 			}
 			//Test these:
 			constraintCheck = 0;
@@ -84,9 +89,8 @@ public class MultiExpression {
 			}
 		} else {
 			conditions = null;
-			values = new Expression[] { new Expression(expression + "+0.0", env), };
+			values = new Expression[] { new Expression(expression + (wantsFloatValue?"+0.0":""), env), };
 		}
-		;
 	}
 
 	private Expression[] conditions;

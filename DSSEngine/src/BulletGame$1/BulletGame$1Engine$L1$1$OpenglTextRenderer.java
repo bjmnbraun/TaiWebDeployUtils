@@ -2,6 +2,7 @@ package BulletGame$1;
 
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
 import java.util.ArrayList;
 
@@ -14,6 +15,8 @@ import processing.core.PFont;
 import processing.core.PImage;
 import processing.opengl.PGraphicsOpenGL;
 import TaiGameCore.GameDataBase;
+import TaiGameCore.P5GLExtend;
+import TaiGameCore.PressActionThreshold;
 import TaiGameCore.PressTypeThreshold;
 import TaiGameCore.TaiImgMap;
 import TaiGameCore.TaiScriptEditor;
@@ -42,17 +45,14 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 		public EditorTextSheet(Rectangle2D.Float usableSpace, int linesToShow,
 				boolean drawBG, boolean editable, boolean showsemicolon,
 				int FontStorageSize, int numberOfGlyphsSqrt) {
-			RowHeight = 1.f / linesToShow; // .05f for 20 lines works pretty
 			this.drawBG = drawBG;
 			this.editable = editable;
 			this.dontDrawSemicolons = !showsemicolon;
 			// well.
 			textR = usableSpace;
 			tse = new TaiScriptEditor("");
-			this.linesToShow = linesToShow;
-			renderedGlyphLocations = new ArrayList[linesToShow];
-			for (int k = 0; k < renderedGlyphLocations.length; renderedGlyphLocations[k] = new ArrayList(), k++)
-				;
+			this.linesToShow = this.linesToShow480 = linesToShow;
+			renderedGlyphLocations = new ArrayList();
 			rowNoise = new float[linesToShow];
 			long myNoiseSeed = 109243;
 			g.noiseSeed(myNoiseSeed);
@@ -87,9 +87,9 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 		private float TXTSCL = 1.0f;
 		private boolean editable = true;
 		private boolean drawBG = true;
-		private final float RowHeight;
+		private float RowHeight;
 		private float LEFT_TXT_INDENT = .01f;
-		private int linesToShow; // Less may actually be "on screen".
+		private int linesToShow, linesToShow480; // Less may actually be "on screen".
 		private float[] rowNoise;
 		private boolean dontDrawSemicolons = false;
 		private float GL_X = 0, GL_Y = 0; // UPDATE ON ALL TRANSLATIONS.
@@ -118,7 +118,15 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 
 		public boolean hasMouseFocus = true;
 
+		public float getRowHeight() {
+			return (RowHeight=1.f / (linesToShow480 * g.height / 480f));
+		}
 		public void draw() {
+			RowHeight = getRowHeight();
+			linesToShow = (int) (1f / RowHeight);
+			for (; renderedGlyphLocations.size() < linesToShow; ){
+				renderedGlyphLocations.add(new ArrayList());
+			}
 			GL2 gl = ((PGraphicsOpenGL) g.g).gl;
 			float textDistance = 4; // Sadly, my text renderer doesn't support
 			// perspective yet.
@@ -188,13 +196,13 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 		private void handleFrameModificationLogic() {
 			// isTextModified |= g.mousePressed;
 			isTextModified |= isResized; // The coordinates change.
-			if (tse.CaretLine > WindowLine + linesToShow - 1) {
+			if (tse.CaretLine >= WindowLine + linesToShow) {
 				isTextModified = true; // New perspectives!
-				WindowLine += tse.CaretLine - (WindowLine + linesToShow - 1);
+				WindowLine = tse.CaretLine - (linesToShow - 1);
 			}
 			if (tse.CaretLine < WindowLine) {
 				isTextModified = true;// New perspectives!
-				WindowLine -= WindowLine - tse.CaretLine;
+				WindowLine = tse.CaretLine;
 			}
 			if (isTextModified) {
 				TextBuffer.reset();
@@ -348,9 +356,9 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 					 * Performance needs work.
 					 */
 					float baseLine = TextFontTmp.size + 1;
-					float yscl = RowHeight * TextFontTmp.size / 725 * TXTSCL;
-					float charW = .06f / (textR.width) * TextFontTmp.size / 725
-							* TXTSCL / NSPH;
+					float viewscl = g.width*textR.width/640f;
+					float yscl = RowHeight * .8f / baseLine; 
+					float charW = .03f * TXTSCL / viewscl / baseLine;
 					// System.out.println(charW);
 					// System.out.println(xscl+" "+yscl);
 
@@ -485,8 +493,11 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 							}
 						}
 						if (!tse.Selection.TemporaryDisable) {
-							tse.Selection = new TaiScriptTxtInfo(tse.CaretLine,
-									tse.CaretPosition, k, bestIndex);
+							tse.CaretLine = k;
+							tse.CaretPosition = bestIndex;
+							//Very good, highlighting selection puts new cursor at new dragged edge of selection.
+							tse.Selection = new TaiScriptTxtInfo(tse.Selection.LineBegin, tse.Selection.CharBegin,
+									tse.CaretLine, tse.CaretPosition);
 						}
 					}
 				} else {
@@ -692,15 +703,15 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 
 		private void markXcoordinate(int rowNumber, int glyphId, float value) {
 			int k = rowNumber - WindowLine;
-			while (glyphId >= renderedGlyphLocations[k].size()) {
-				renderedGlyphLocations[k].add(0f);
+			while (glyphId >= renderedGlyphLocations.get(k).size()) {
+				renderedGlyphLocations.get(k).add(0f);
 			}
-			renderedGlyphLocations[k].set(glyphId, value);
+			renderedGlyphLocations.get(k).set(glyphId, value);
 		}
 
 		private void clearXcoordinates(int rowNumber) {
 			int k = rowNumber - WindowLine;
-			renderedGlyphLocations[k].clear();
+			renderedGlyphLocations.get(k).clear();
 		}
 
 		/**
@@ -718,13 +729,13 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 						+ glyphId);
 			}
 			int k = rowNumber - WindowLine;
-			if (glyphId >= renderedGlyphLocations[k].size()) {
+			if (glyphId >= renderedGlyphLocations.get(k).size()) {
 				return 1;
 			}
-			return renderedGlyphLocations[k].get(glyphId);
+			return renderedGlyphLocations.get(k).get(glyphId);
 		}
 
-		private ArrayList<Float>[] renderedGlyphLocations;// linesToShow
+		private ArrayList<ArrayList<Float>> renderedGlyphLocations;// linesToShow
 
 		public void setTextFont(PFont font) {
 			TextFont = font;
@@ -864,6 +875,11 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			ets.cleanup();
 			removeSubKeyListener(ets);
 		}
+
+		public float getRowHeight() {
+			return ets.getRowHeight();
+		}
+
 	}
 	
 
@@ -891,7 +907,7 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 			innerArea = new Rectangle2D.Float(0f, .2f, 1f, .79f);
 			scaleRect(innerArea, area);
 			ets = new TaiTextBox(innerArea, 24);
-			ets.setTextScale(.4f);
+			ets.setTextScale(.6f);
 			ets.ets.setSelectable(true);
 			ets.ets.setTextRestrictions(0, 0);
 			ets.setText(hash);
@@ -900,10 +916,8 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 
 			Rectangle2D.Float topArea = new Rectangle2D.Float(0f, 0f, 1f, .2f);
 			scaleRect(topArea, area);
-			display = new TaiTextBox(topArea, 2);
-			display.setTextScale(.6f);
-			display
-					.setText("Your save game is below. Copy it to your clipboard (make sure \nyou select all of it, try CTRL+A), and press ESCAPE to return.");
+			display = new TaiTextBox(topArea, 3);
+			display.setText("Your save game is below. Copy it to your clipboard \n(make sure you select all of it, try CTRL+A), \n and press ESCAPE to return.");
 		}
 
 		public void cleanup() {
@@ -951,4 +965,42 @@ public abstract class BulletGame$1Engine$L1$1$OpenglTextRenderer extends
 		texPlace.width /= dialogPlace.width;
 		texPlace.height /= dialogPlace.height;
 	}
+	
+	public static class MouseChecker {
+		public MouseChecker(P5GLExtend g){
+			this.g2 = g;
+		}
+		private boolean isInvalidPress;
+		private P5GLExtend g2;
+		public Point2D.Float getMouse(){
+			return new Point2D.Float(g2.g.mouseX / (float) g2.currentViewPortWidth,
+					g2.g.mouseY / (float) g2.currentViewPortHeight);
+		}
+		private PressActionThreshold pat = new PressActionThreshold(.3f,20f);
+		public boolean hovers(Rectangle2D.Float r){
+			PApplet g = g2.g;
+			float moX = g.mouseX / (float) g2.currentViewPortWidth;
+			float moY = g.mouseY / (float) g2.currentViewPortHeight;
+			Point2D.Float mo = new Point2D.Float(moX, moY);
+			return r.contains(mo);
+		}
+		public boolean mouseChecker(Rectangle2D.Float r){
+			PApplet g = g2.g;
+			if (g.mousePressed){
+				if (hovers(r) && pat.isActionTime(true)){
+					if (isInvalidPress){
+						return false;
+					}
+					return true;
+				} else {
+					isInvalidPress = true;
+				}
+			} else {
+				pat.isActionTime(false);
+				isInvalidPress = false;
+			}
+			return false;
+		}
+	}
+
 }

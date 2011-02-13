@@ -13,6 +13,8 @@ import TaiGameCore.GameDataBase;
 import TaiGameCore.TaiDAWG;
 import TaiGameCore.GameDataBase.StringBase.ExtendsData;
 import TaiGameCore.GameDataBase.StringBase.MakeGetters;
+import TaiGameCore.GameDataBase.StringBase.ScopePreValidate;
+import TaiGameCore.GameDataBase.StringBase.ValidationException;
 
 /**
  * Fills in the appropriate automatic serialization / deserialization of a given gamedatabase
@@ -42,10 +44,20 @@ public class GameDataBase$AutoWriter {
 		if (GameDataBase.StringBase.class.isAssignableFrom(got)){
 			handleExtendedTemplates(got,fields);
 			//We have a string parsable class. Write its parser.
-			System.out.println("public ArrayList<Exception> parseFromStrings(TaiDAWG<String> data, Validator ... valid) {");
+			System.out.println("public ArrayList<Exception> parseFromStrings(TaiDAWG<TaiScriptStatementAndContext> data, Validator ... valid) {");
 			System.out.println("\tArrayList<Exception> toRet = new ArrayList();");
-			System.out.println("\tWordByRef<String> word;");
+			System.out.println("\tWordByRef<TaiScriptStatementAndContext> word;");
 			ArrayList<String> scriptables = new ArrayList();
+
+			String scopeAndValidate = null;
+			try {
+				GameDataBase.StringBase.ScopePreValidate a = (ScopePreValidate) got.getAnnotation(GameDataBase.StringBase.ScopePreValidate.class);
+				if (a!=null){
+					scopeAndValidate = a.method();
+				}
+			} catch (NullPointerException e){
+				//None.
+			}
 			for(Field k : fields){
 				boolean isCritical = false;
 				try {
@@ -75,43 +87,62 @@ public class GameDataBase$AutoWriter {
 				} catch (NullPointerException e){
 					//None.
 				}
+				boolean skipScopeAndValidate = false;
+				try {
+					GameDataBase.StringBase.IsUnscoped a = k.getAnnotation(GameDataBase.StringBase.IsUnscoped.class);
+					if (a!=null){
+						skipScopeAndValidate = true;
+					}
+				} catch (NullPointerException e){
+					//None.
+				}
 				if (isScriptable){
 					System.out.println("\tword = data.get(\""+k.getName()+"\");");
-					System.out.println("\tif (word!=null){String val = word.getContentData();");
-					if (valid!=-1){
-						System.out.println("try {");
-						System.out.println("\tvalid["+valid+"].validate(\""+k.getName()+"\",val);");
+					System.out.println("\tif (word!=null){String val = word.getContentData().rawString;");
+					
+					System.out.println("try {");
+					{//Validating exceptions! If it does not validate, don't write it.
+						System.out.println("if (false){throw new ValidationException(null, null);}//Workaround for unreachable catch block");
+						if (scopeAndValidate!=null && !skipScopeAndValidate){
+							System.out.println("val = "+scopeAndValidate+"(word.getContentData(),"+k.getType().getSimpleName()+".class,\""+k.getName()+"\");");
+						}
+						if (valid!=-1){
+							System.out.println("\tvalid["+valid+"].validate(\""+k.getName()+"\",val);");
+						}
+
+						if (k.getType().equals(String.class)){
+							System.out.println("\t"+k.getName()+"= val;");
+						} else if (k.getType().equals(Integer.TYPE)){
+							System.out.println("\t"+k.getName()+"= new Integer(val.trim());");
+						} else if (k.getType().equals(int[].class)){
+							System.out.println("\tString[] spli = val.split(\",\");");
+							System.out.println("\t"+k.getName()+"= new int[spli.length];");	
+							System.out.println("\tfor(int k = 0; k < spli.length; k++){");
+							System.out.println("\t\t"+k.getName()+"[k]=new Integer(spli[k].trim());");
+							System.out.println("\t}");
+						} else if (k.getType().equals(double[].class)){
+							System.out.println("\tString[] spli = val.split(\",\");");
+							System.out.println("\t"+k.getName()+"= new double[spli.length];");	
+							System.out.println("\tfor(int k = 0; k < spli.length; k++){");
+							System.out.println("\t\t"+k.getName()+"[k]=new Double(spli[k].trim());");
+							System.out.println("\t}");
+						} else if (k.getType().equals(float[].class)){
+							System.out.println("\tString[] spli = val.split(\",\");");
+							System.out.println("\t"+k.getName()+"= new float[spli.length];");	
+							System.out.println("\tfor(int k = 0; k < spli.length; k++){");
+							System.out.println("\t\t"+k.getName()+"[k]=new Float(spli[k].trim());");
+							System.out.println("\t}");
+						} else if (k.getType().equals(Double.TYPE)){
+							System.out.println("\t"+k.getName()+"= new Double(val.trim());");
+						} else if (k.getType().equals(Float.TYPE)){
+							System.out.println("\t"+k.getName()+"= new Float(val.trim());");
+						} else {
+							System.out.println("Unknown type : "+k.getName());
+						}
+
+						//Validate error? add exception, don't store value.
 						System.out.println("} catch (ValidationException e){");
 						System.out.println("toRet.add(e);}");
-					}
-					if (k.getType().equals(String.class)){
-						System.out.println("\t"+k.getName()+"= val;");
-					} else if (k.getType().equals(Integer.TYPE)){
-						System.out.println("\t"+k.getName()+"= new Integer(val.trim());");
-					} else if (k.getType().equals(int[].class)){
-						System.out.println("\tString[] spli = val.split(\",\");");
-						System.out.println("\t"+k.getName()+"= new int[spli.length];");	
-						System.out.println("\tfor(int k = 0; k < spli.length; k++){");
-						System.out.println("\t\t"+k.getName()+"[k]=new Integer(spli[k].trim());");
-						System.out.println("\t}");
-					} else if (k.getType().equals(double[].class)){
-						System.out.println("\tString[] spli = val.split(\",\");");
-						System.out.println("\t"+k.getName()+"= new double[spli.length];");	
-						System.out.println("\tfor(int k = 0; k < spli.length; k++){");
-						System.out.println("\t\t"+k.getName()+"[k]=new Double(spli[k].trim());");
-						System.out.println("\t}");
-					} else if (k.getType().equals(float[].class)){
-						System.out.println("\tString[] spli = val.split(\",\");");
-						System.out.println("\t"+k.getName()+"= new float[spli.length];");	
-						System.out.println("\tfor(int k = 0; k < spli.length; k++){");
-						System.out.println("\t\t"+k.getName()+"[k]=new Float(spli[k].trim());");
-						System.out.println("\t}");
-					} else if (k.getType().equals(Double.TYPE)){
-						System.out.println("\t"+k.getName()+"= new Double(val.trim());");
-					} else if (k.getType().equals(Float.TYPE)){
-						System.out.println("\t"+k.getName()+"= new Float(val.trim());");
-					} else {
-						System.out.println("Unknown type : "+k.getName());
 					}
 					System.out.println("\t}");
 					if (isCritical){
@@ -122,7 +153,7 @@ public class GameDataBase$AutoWriter {
 				}
 			}
 			//Do we have any unrecognized fields?
-			System.out.println("StringTreeIterator<WordByRef<String>> iterator = data.iterator();");
+			System.out.println("StringTreeIterator<WordByRef<TaiScriptStatementAndContext>> iterator = data.iterator();");
 			System.out.println("while(iterator.hasNext()){");
 			System.out.println("	String key = iterator.next();");
 			System.out.print("if (");

@@ -85,6 +85,9 @@ public class TaiScriptEditor extends GameDataBase{
 	public void setLine(String text, int line){
 		//resetCaret();
 		CaretPosition = Math.min(CaretPosition,text.length()-1);
+		while(Editing.size() <= line){
+			Editing.add(""+LINE_END_SUBCHAR);
+		}
 		Editing.set(line,text+LINE_END_SUBCHAR);
 		hasUnsavedChanges = true;
 	}
@@ -319,6 +322,7 @@ public class TaiScriptEditor extends GameDataBase{
 	public void clear() {
 		Editing.clear();
 		resetCaret();
+		Editing.add(""+LINE_END_SUBCHAR);
 		hasUnsavedChanges = false;
 	}
 	public void clearBlanks(){
@@ -326,7 +330,7 @@ public class TaiScriptEditor extends GameDataBase{
 			throw new RuntimeException("ClearBlanks can only be used on editors that have locked # of lines");
 		}
 		clear();
-		for(int k = 0; k < BoundedMaxLines; k++){
+		for(; Editing.size() < BoundedMaxLines;){
 			Editing.add(""+LINE_END_SUBCHAR);
 		}
 	}

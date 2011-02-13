@@ -394,6 +394,20 @@ public class TaiTrees {
 		public TaiTreeOTreesNode<F> getCurrentNode() {
 			return nextReturnNode;
 		}
+
+		//Could be optimized by adding size of subtrees... hmm...
+		public int indexOf(String filename) {
+			int count = 0;
+			int index = -1;
+			while(hasNext()){
+				if (next().equals(filename)){
+					index = count;
+				}
+				count++;
+				tryNext();
+			}
+			return index;
+		}
 	}
 
 	/**
